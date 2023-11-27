@@ -1,0 +1,8 @@
+obj/
+bin/
+libs/
+libraries/
+
+.vscode/
+.vs/
+xcopy/

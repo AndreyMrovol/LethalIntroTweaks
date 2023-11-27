@@ -1,5 +1,5 @@
 # IntroTweaks
-Configurable, seamless skipping of intro screens.
+A configurable, quality of life mod for Lethal Company intro/menu screens.
 
 ## What does it do?
 - Skips straight into the selected mode. (Online/LAN)

@@ -13,7 +13,9 @@ namespace IntroTweaks.Patches {
 
         [HarmonyPostfix]
         [HarmonyPatch("Start")]
-        static void SkipToOnline(ref PreInitSceneScript __instance, ref bool ___choseLaunchOption) {
+        static void SkipToOnline(PreInitSceneScript __instance, ref bool ___choseLaunchOption) {
+            if (Plugin.SelectedMode.Equals("off")) return;
+
             __instance.LaunchSettingsPanels = new GameObject[0];
             __instance.currentLaunchSettingPanel = 0;
             __instance.headerText.text = "";
@@ -27,7 +29,8 @@ namespace IntroTweaks.Patches {
             if (IngamePlayerSettings.Instance.encounteredErrorDuringSave)
                 return;
 
-            SceneManager.LoadSceneAsync("InitScene");
+            string sceneToLoad = Plugin.SelectedMode.Equals("lan") ? "InitSceneLANMode" : "InitScene";
+            SceneManager.LoadScene(sceneToLoad);
         }
     }
 }

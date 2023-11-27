@@ -13,6 +13,8 @@ namespace IntroTweaks {
         internal static new ManualLogSource Logger { get; private set; }
         public static new PluginConfig Config { get; private set; }
 
+        internal static string SelectedMode { get; private set; }
+
         private Harmony patcher;
 
         private void Awake() {
@@ -21,29 +23,18 @@ namespace IntroTweaks {
 
             if (!PluginEnabled(logIfDisabled: true)) return;
 
-            //Config.InitBindings();
+            Config.InitBindings();
+            SelectedMode = Config.AUTO_SELECT_MODE.ToLower();
 
             try {
-                InitPatcher();
+                patcher = new(Metadata.GUID);
+                patcher.PatchAll();
+
                 Logger.LogInfo("Plugin loaded.");
             }
             catch (Exception e) {
                 Logger.LogError(e);
             }
-        }
-
-        private void InitPatcher() {
-            patcher = new(Metadata.GUID);
-            patcher.PatchAll();
-
-            LogPatches();
-        }
-
-        public void LogPatches() {
-            IEnumerable<MethodBase> patches = patcher.GetPatchedMethods();
-            string str = string.Join(", ", patches.ToList());
-
-            Logger.LogInfo("Applied patches to: " + str);
         }
 
         public bool PluginEnabled(bool logIfDisabled = false) {

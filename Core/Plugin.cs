@@ -18,7 +18,7 @@ namespace IntroTweaks {
             Logger = base.Logger;
             Config = new(base.Config);
 
-            if (!PluginEnabled(logIfDisabled: true)) return;
+            if (!PluginEnabled(logDisabled: true)) return;
 
             Config.InitBindings();
             SelectedMode = Config.AUTO_SELECT_MODE.ToLower();
@@ -34,9 +34,9 @@ namespace IntroTweaks {
             }
         }
 
-        public bool PluginEnabled(bool logIfDisabled = false) {
+        public bool PluginEnabled(bool logDisabled = false) {
             bool enabled = Config.PLUGIN_ENABLED;
-            if (!enabled && logIfDisabled) {
+            if (!enabled && logDisabled) {
                 Logger.LogInfo("IntroTweaks disabled globally.");
             }
 

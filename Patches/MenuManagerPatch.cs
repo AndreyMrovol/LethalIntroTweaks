@@ -35,6 +35,12 @@ namespace IntroTweaks.Patches {
         }
 
         [HarmonyPrefix]
+        [HarmonyPatch("ClickHostButton")]
+        static void DisableMenuOnHost(MenuManager __instance) {
+            __instance.menuButtons.SetActive(false);
+        }
+
+        [HarmonyPrefix]
         [HarmonyPatch("Awake")]
         static bool ReplaceVersionText(MenuManager __instance) {
             GameObject original = __instance.versionNumberText.transform.gameObject;

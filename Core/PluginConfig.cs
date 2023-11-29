@@ -34,7 +34,7 @@ namespace IntroTweaks.Core {
                 "Valid options: ONLINE, LAN, OFF"
             );
 
-            AUTO_SELECT_HOST = NewEntry("bAutoSelectHost", true,
+            AUTO_SELECT_HOST = NewEntry("bAutoSelectHost", false,
                 "Whether the 'Host' button is automatically selected when the Online/LAN menu loads."
             );
 

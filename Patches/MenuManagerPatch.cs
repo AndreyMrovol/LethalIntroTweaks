@@ -1,17 +1,38 @@
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 namespace IntroTweaks.Patches {
     [HarmonyPatch(typeof(MenuManager))]
     internal class MenuManagerPatch {
         public static int gameVer { get; private set; }
         public static TextMeshProUGUI versionText { get; private set; }
+        public static bool isMenuScene { get; private set; }
 
-        [HarmonyPostfix]
-        [HarmonyPatch("Update")]
-        static void OverrideGameVersionText() {
-            versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
+        [HarmonyPrefix]
+        [HarmonyPatch("ClickHostButton")]
+        static void DisableMenuOnHost(MenuManager __instance) {
+            __instance.menuButtons.SetActive(false);
+            versionText.transform.gameObject.SetActive(false);
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch("Awake")]
+        static bool ReplaceVersionText(MenuManager __instance) {
+            isMenuScene = SceneManager.GetActiveScene().name == "MainMenu";
+
+            GameObject original = __instance.versionNumberText.transform.gameObject;
+            GameObject clone = Object.Instantiate(original, __instance.menuButtons.transform);
+            original.SetActive(false);
+
+            clone.name = "VersionNumberText";
+
+            versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
+            AnchorToBottom(clone.GetComponent<RectTransform>());
+
+            return true;
         }
 
         [HarmonyPostfix]
@@ -34,25 +55,22 @@ namespace IntroTweaks.Patches {
             }
         }
 
-        [HarmonyPrefix]
-        [HarmonyPatch("ClickHostButton")]
-        static void DisableMenuOnHost(MenuManager __instance) {
-            __instance.menuButtons.SetActive(false);
-        }
+        [HarmonyPostfix]
+        [HarmonyPatch("Update")]
+        static void OverrideGameVersionText(MenuManager __instance) {
+            if (isMenuScene) {
+                versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
 
-        [HarmonyPrefix]
-        [HarmonyPatch("Awake")]
-        static bool ReplaceVersionText(MenuManager __instance) {
-            GameObject original = __instance.versionNumberText.transform.gameObject;
-            GameObject clone = Object.Instantiate(original, original.transform.parent);
-            original.SetActive(false);
+                bool atMenu = __instance.menuButtons.activeSelf;
+                bool pressedEsc = Keyboard.current.escapeKey.wasPressedThisFrame;
 
-            clone.name = "VersionNumberText";
+                if (atMenu && pressedEsc) {
+                    isMenuScene = false;
+                    Plugin.SelectedMode = "off";
 
-            versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-            AnchorToBottom(clone.GetComponent<RectTransform>());
-
-            return true;
+                    SceneManager.LoadScene("InitSceneLaunchOptions");
+                }
+            }
         }
 
         static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {

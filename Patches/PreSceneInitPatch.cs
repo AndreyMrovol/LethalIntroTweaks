@@ -14,7 +14,11 @@ namespace IntroTweaks.Patches {
         [HarmonyPostfix]
         [HarmonyPatch("Start")]
         static void SkipToOnline(PreInitSceneScript __instance, ref bool ___choseLaunchOption) {
-            if (Plugin.SelectedMode.Equals("off")) return;
+            if (Plugin.SelectedMode.Equals("off")) {
+                __instance.PressContinueButton();
+                __instance.PressContinueButton();
+                return;
+            }
 
             __instance.LaunchSettingsPanels = new GameObject[0];
             __instance.currentLaunchSettingPanel = 0;

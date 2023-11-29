@@ -56,7 +56,7 @@ namespace IntroTweaks.Core {
                 "Positive = Right, Negative = Left"
             );
 
-            VERSION_TEXT_Y = NewEntry("fVersionTextYPos", 553f,
+            VERSION_TEXT_Y = NewEntry("fVersionTextYPos", 555f,
                 "The position on the vertical axis where the version text should be placed.\n" +
                 "Positive = Up, Negative = Down"
             );

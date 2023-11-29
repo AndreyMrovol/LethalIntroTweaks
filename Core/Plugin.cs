@@ -10,7 +10,7 @@ namespace IntroTweaks {
         internal static new ManualLogSource Logger { get; private set; }
         public static new PluginConfig Config { get; private set; }
 
-        internal static string SelectedMode { get; private set; }
+        internal static string SelectedMode;
 
         private Harmony patcher;
 

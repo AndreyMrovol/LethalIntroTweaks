@@ -9,7 +9,6 @@ namespace IntroTweaks.Patches {
     internal class MenuManagerPatch {
         public static int gameVer { get; private set; }
         public static TextMeshProUGUI versionText { get; private set; }
-        public static bool isMenuScene { get; private set; }
 
         [HarmonyPrefix]
         [HarmonyPatch("ClickHostButton")]
@@ -21,8 +20,6 @@ namespace IntroTweaks.Patches {
         [HarmonyPrefix]
         [HarmonyPatch("Awake")]
         static bool ReplaceVersionText(MenuManager __instance) {
-            isMenuScene = SceneManager.GetActiveScene().name == "MainMenu";
-
             GameObject original = __instance.versionNumberText.transform.gameObject;
             GameObject clone = Object.Instantiate(original, __instance.menuButtons.transform);
             original.SetActive(false);
@@ -57,20 +54,19 @@ namespace IntroTweaks.Patches {
 
         [HarmonyPostfix]
         [HarmonyPatch("Update")]
-        static void OverrideGameVersionText(MenuManager __instance) {
-            if (isMenuScene) {
-                versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
+        static void UpdatePatch(MenuManager __instance) {
+            // Override version text with game version.
+            versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
 
-                bool atMenu = __instance.menuButtons.activeSelf;
-                bool pressedEsc = Keyboard.current.escapeKey.wasPressedThisFrame;
+            //bool atMenu = __instance.menuButtons.activeSelf;
+            //bool pressedEsc = Keyboard.current.escapeKey.wasPressedThisFrame;
 
-                if (atMenu && pressedEsc) {
-                    isMenuScene = false;
-                    Plugin.SelectedMode = "off";
+            //if (atMenu && pressedEsc) {
+            //    Plugin.SelectedMode = "off";
+            //    GameNetworkManager.Instance.disableSteam = !__instance.lanButtonContainer.activeSelf;
 
-                    SceneManager.LoadScene("InitSceneLaunchOptions");
-                }
-            }
+            //    SceneManager.LoadScene("InitSceneLaunchOptions");
+            //}
         }
 
         static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {

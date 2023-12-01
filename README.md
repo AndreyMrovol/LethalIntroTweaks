@@ -9,18 +9,18 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 - Skip splash screen (zeekers, not Unity)
 
 ## Changelog History
-# v1.0.0
+### v1.0.0
 - Skips straight into the selected mode. (Online/LAN)
 - Can automatically press the 'Host' button once in the menu.
 - Removes the LAN warning - no need to hit 'Confirm' every time.
 
-# v1.1.0
+### v1.1.0
 - Menu 'OS boot' animation is now skipped. You can revert this via the config.
 - Replaced menu version text - able to be customized.
 - Fixed LAN warning not being removed when AutoSelectHost was false.
 - Changed mod name from 'LC-IntroTweaks' to 'IntroTweaks' in PluginMetadata.
 
-# v1.2.0
+### v1.2.0
 **General**
 - Launch skipping is now more seamless - the greenish "transition" panel has been disabled.
 - Stopped panels overlapping when pressing the 'Host' button. (how other buttons work already)

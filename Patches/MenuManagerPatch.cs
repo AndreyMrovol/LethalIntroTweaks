@@ -1,8 +1,6 @@
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 
 namespace IntroTweaks.Patches {
     [HarmonyPatch(typeof(MenuManager))]
@@ -14,20 +12,24 @@ namespace IntroTweaks.Patches {
         [HarmonyPatch("ClickHostButton")]
         static void DisableMenuOnHost(MenuManager __instance) {
             __instance.menuButtons.SetActive(false);
-            versionText.transform.gameObject.SetActive(false);
+            if (Plugin.Config.CUSTOM_VERSION_TEXT) {
+                versionText.transform.gameObject.SetActive(false);
+            }
         }
 
         [HarmonyPrefix]
         [HarmonyPatch("Awake")]
         static bool ReplaceVersionText(MenuManager __instance) {
-            GameObject original = __instance.versionNumberText.transform.gameObject;
-            GameObject clone = Object.Instantiate(original, __instance.menuButtons.transform);
-            original.SetActive(false);
+            if (Plugin.Config.CUSTOM_VERSION_TEXT) {
+                GameObject original = __instance.versionNumberText.transform.gameObject;
+                GameObject clone = Object.Instantiate(original, __instance.menuButtons.transform);
+                original.SetActive(false);
 
-            clone.name = "VersionNumberText";
+                clone.name = "VersionNumberText";
 
-            versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-            AnchorToBottom(clone.GetComponent<RectTransform>());
+                versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
+                AnchorToBottom(clone.GetComponent<RectTransform>());
+            }
 
             return true;
         }
@@ -43,7 +45,7 @@ namespace IntroTweaks.Patches {
                 Object.Destroy(__instance.lanWarningContainer);
             }
 
-            if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN) {
+            if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN && __instance.launchedInLanModeText) {
                 Object.Destroy(__instance.launchedInLanModeText.transform.gameObject);
             }
 
@@ -54,9 +56,11 @@ namespace IntroTweaks.Patches {
 
         [HarmonyPostfix]
         [HarmonyPatch("Update")]
-        static void UpdatePatch(MenuManager __instance) {
+        static void UpdatePatch() {
             // Override version text with game version.
-            versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
+            if (Plugin.Config.CUSTOM_VERSION_TEXT) {
+                versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
+            }
 
             //bool atMenu = __instance.menuButtons.activeSelf;
             //bool pressedEsc = Keyboard.current.escapeKey.wasPressedThisFrame;

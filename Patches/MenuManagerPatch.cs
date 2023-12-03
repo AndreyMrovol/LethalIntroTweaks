@@ -21,14 +21,14 @@ namespace IntroTweaks.Patches {
         [HarmonyPatch("Awake")]
         static bool ReplaceVersionText(MenuManager __instance) {
             if (Plugin.Config.REPLACE_VERSION_TEXT) {
-            GameObject original = __instance.versionNumberText.transform.gameObject;
-            GameObject clone = Object.Instantiate(original, __instance.menuButtons.transform);
-            original.SetActive(false);
+                GameObject original = __instance.versionNumberText.transform.gameObject;
+                GameObject clone = Object.Instantiate(original, __instance.menuButtons.transform);
+                original.SetActive(false);
 
-            clone.name = "VersionNumberText";
+                clone.name = "VersionNumberText";
 
-            versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-            AnchorToBottom(clone.GetComponent<RectTransform>());
+                versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
+                AnchorToBottom(clone.GetComponent<RectTransform>());
             }
             return true;
         }

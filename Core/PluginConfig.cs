@@ -15,7 +15,7 @@ namespace IntroTweaks.Core {
         public bool REMOVE_LAUNCHED_IN_LAN { get; private set; }
         public bool REMOVE_NEWS_PANEL { get; private set; }
 
-        public bool REPLACE_VERSION_TEXT { get; private set; }
+        public bool CUSTOM_VERSION_TEXT { get; private set; }
         public string VERSION_TEXT { get; private set; }
         public float VERSION_TEXT_X { get; private set; }
         public float VERSION_TEXT_Y { get; private set; }
@@ -47,8 +47,8 @@ namespace IntroTweaks.Core {
             REMOVE_LAUNCHED_IN_LAN = NewEntry("bRemoveLaunchedInLanText", true, "Remove the 'Launched in LAN mode' text below the Quit button.");
             REMOVE_NEWS_PANEL = NewEntry("bRemoveNewsPanel", false, "Remove the panel that displays news such as game updates.");
 
-            REPLACE_VERSION_TEXT = NewEntry("bReplaceVersionText", true,
-                "Enable or disable replacing the game's version text with custom text."
+            CUSTOM_VERSION_TEXT = NewEntry("bCustomVersionText", false,
+                "Whether to replace the game's version text with a custom alternative."
             );
 
             VERSION_TEXT = NewEntry("sVersionText", "v$VERSION\n[MODDED]", 

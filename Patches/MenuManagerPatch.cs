@@ -1,8 +1,6 @@
 using HarmonyLib;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem;
 
 namespace IntroTweaks.Patches {
     [HarmonyPatch(typeof(MenuManager))]
@@ -14,7 +12,7 @@ namespace IntroTweaks.Patches {
         [HarmonyPatch("ClickHostButton")]
         static void DisableMenuOnHost(MenuManager __instance) {
             __instance.menuButtons.SetActive(false);
-            if (Plugin.Config.REPLACE_VERSION_TEXT) {
+            if (Plugin.Config.CUSTOM_VERSION_TEXT) {
                 versionText.transform.gameObject.SetActive(false);
             }
         }
@@ -22,7 +20,7 @@ namespace IntroTweaks.Patches {
         [HarmonyPrefix]
         [HarmonyPatch("Awake")]
         static bool ReplaceVersionText(MenuManager __instance) {
-            if (Plugin.Config.REPLACE_VERSION_TEXT) {
+            if (Plugin.Config.CUSTOM_VERSION_TEXT) {
                 GameObject original = __instance.versionNumberText.transform.gameObject;
                 GameObject clone = Object.Instantiate(original, __instance.menuButtons.transform);
                 original.SetActive(false);
@@ -32,6 +30,7 @@ namespace IntroTweaks.Patches {
                 versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
                 AnchorToBottom(clone.GetComponent<RectTransform>());
             }
+
             return true;
         }
 
@@ -57,9 +56,9 @@ namespace IntroTweaks.Patches {
 
         [HarmonyPostfix]
         [HarmonyPatch("Update")]
-        static void UpdatePatch(MenuManager __instance) {
+        static void UpdatePatch() {
             // Override version text with game version.
-            if (Plugin.Config.REPLACE_VERSION_TEXT) {
+            if (Plugin.Config.CUSTOM_VERSION_TEXT) {
                 versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
             }
 

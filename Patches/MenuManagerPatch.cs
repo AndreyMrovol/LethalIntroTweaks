@@ -14,7 +14,9 @@ namespace IntroTweaks.Patches {
         [HarmonyPatch("ClickHostButton")]
         static void DisableMenuOnHost(MenuManager __instance) {
             __instance.menuButtons.SetActive(false);
-            versionText.transform.gameObject.SetActive(false);
+            if (Plugin.Config.REPLACE_VERSION_TEXT) {
+                versionText.transform.gameObject.SetActive(false);
+            }
         }
 
         [HarmonyPrefix]

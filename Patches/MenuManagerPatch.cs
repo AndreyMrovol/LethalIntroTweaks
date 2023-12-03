@@ -20,6 +20,7 @@ namespace IntroTweaks.Patches {
         [HarmonyPrefix]
         [HarmonyPatch("Awake")]
         static bool ReplaceVersionText(MenuManager __instance) {
+            if (Plugin.Config.REPLACE_VERSION_TEXT) {
             GameObject original = __instance.versionNumberText.transform.gameObject;
             GameObject clone = Object.Instantiate(original, __instance.menuButtons.transform);
             original.SetActive(false);
@@ -28,7 +29,7 @@ namespace IntroTweaks.Patches {
 
             versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
             AnchorToBottom(clone.GetComponent<RectTransform>());
-
+            }
             return true;
         }
 
@@ -56,7 +57,9 @@ namespace IntroTweaks.Patches {
         [HarmonyPatch("Update")]
         static void UpdatePatch(MenuManager __instance) {
             // Override version text with game version.
+            if (Plugin.Config.REPLACE_VERSION_TEXT) {
             versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
+            }
 
             //bool atMenu = __instance.menuButtons.activeSelf;
             //bool pressedEsc = Keyboard.current.escapeKey.wasPressedThisFrame;

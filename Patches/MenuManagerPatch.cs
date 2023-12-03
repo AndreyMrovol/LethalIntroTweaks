@@ -44,7 +44,7 @@ namespace IntroTweaks.Patches {
                 Object.Destroy(__instance.lanWarningContainer);
             }
 
-            if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN) {
+            if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN && __instance.launchedInLanModeText) {
                 Object.Destroy(__instance.launchedInLanModeText.transform.gameObject);
             }
 

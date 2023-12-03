@@ -45,8 +45,11 @@ namespace IntroTweaks.Patches {
                 Object.Destroy(__instance.lanWarningContainer);
             }
 
-            if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN && __instance.launchedInLanModeText) {
-                Object.Destroy(__instance.launchedInLanModeText.transform.gameObject);
+            if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN) {
+                GameObject lanModeText = __instance.launchedInLanModeText?.transform.gameObject;
+                if (lanModeText) {
+                    Object.Destroy(lanModeText);
+                }
             }
 
             if (Plugin.Config.AUTO_SELECT_HOST) {

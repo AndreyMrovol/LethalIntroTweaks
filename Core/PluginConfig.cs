@@ -47,7 +47,7 @@ namespace IntroTweaks.Core {
             REMOVE_LAUNCHED_IN_LAN = NewEntry("bRemoveLaunchedInLanText", true, "Remove the 'Launched in LAN mode' text below the Quit button.");
             REMOVE_NEWS_PANEL = NewEntry("bRemoveNewsPanel", false, "Remove the panel that displays news such as game updates.");
 
-            CUSTOM_VERSION_TEXT = NewEntry("bCustomVersionText", false,
+            CUSTOM_VERSION_TEXT = NewEntry("bCustomVersionText", true,
                 "Whether to replace the game's version text with a custom alternative."
             );
 

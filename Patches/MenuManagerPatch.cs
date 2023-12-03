@@ -58,7 +58,7 @@ namespace IntroTweaks.Patches {
         static void UpdatePatch(MenuManager __instance) {
             // Override version text with game version.
             if (Plugin.Config.REPLACE_VERSION_TEXT) {
-            versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
+                versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
             }
 
             //bool atMenu = __instance.menuButtons.activeSelf;

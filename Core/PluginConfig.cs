@@ -65,7 +65,9 @@ namespace IntroTweaks.Core {
                 "Valid options: FULL, SHORT"
             );
 
-            VERSION_TEXT_SIZE = NewEntry("fVersionTextSize", 20f, "The font size of the version text.");
+            VERSION_TEXT_SIZE = NewEntry("fVersionTextSize", 20f, 
+                "The font size of the version text. Min = 10, Max = 40."
+            );
 
             VERSION_TEXT_X = NewEntry("fVersionTextXPos", 1089.9f,
                 "The position on the horizontal axis where the version text should be placed.\n" +
@@ -77,7 +79,7 @@ namespace IntroTweaks.Core {
                 "Positive = Up, Negative = Down"
             );
 
-            DISABLE_FIRST_DAY_SFX = NewEntry("bDisableFirstDaySFX", true, "Toggles the first day ship speaker SFX.");
+            DISABLE_FIRST_DAY_SFX = NewEntry("bDisableFirstDaySFX", false, "Toggles the first day ship speaker SFX.");
         }
     }
 }

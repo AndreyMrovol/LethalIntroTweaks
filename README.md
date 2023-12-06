@@ -39,3 +39,9 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 - Added config option to toggle the version text. Credit - RectangularObject.
 - BepinExPack now specified as a dependency.
 - New VCR-style icon.
+
+### v1.2.2
+- The ship speaker 'first day' SFX can now be disabled via `bDisableFirstDaySFX`.
+- Added config option `sVersionTextFormat` to display either the full game version or a shortened one.
+- Added config option `fVersionTextSize` to control the font size of the version text.
+- Fixed custom version text not showing - it was accidentally off by default (oops).

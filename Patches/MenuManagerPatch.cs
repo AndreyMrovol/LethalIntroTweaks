@@ -72,7 +72,7 @@ namespace IntroTweaks.Patches {
             gameVer = Mathf.Abs(format.Equals("short") ? realVer - 16440 : realVer);
 
             tmp.text = Plugin.Config.VERSION_TEXT;
-            tmp.fontSize = tmp.fontSizeMin = 22f;
+            tmp.fontSize = Mathf.Clamp(Plugin.Config.VERSION_TEXT_SIZE, 10, 40);
             tmp.alignment = TextAlignmentOptions.Center;
             tmp.enableWordWrapping = false;
 

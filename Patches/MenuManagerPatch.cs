@@ -64,20 +64,12 @@ namespace IntroTweaks.Patches {
             if (Plugin.Config.CUSTOM_VERSION_TEXT) {
                 versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
             }
-
-            //bool atMenu = __instance.menuButtons.activeSelf;
-            //bool pressedEsc = Keyboard.current.escapeKey.wasPressedThisFrame;
-
-            //if (atMenu && pressedEsc) {
-            //    Plugin.SelectedMode = "off";
-            //    GameNetworkManager.Instance.disableSteam = !__instance.lanButtonContainer.activeSelf;
-
-            //    SceneManager.LoadScene("InitSceneLaunchOptions");
-            //}
         }
 
         static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {
-            gameVer = GameNetworkManager.Instance.gameVersionNum - 16440;
+            int realVer = GameNetworkManager.Instance.gameVersionNum;
+            string format = Plugin.Config.VERSION_TEXT_FORMAT.ToLower();
+            gameVer = Mathf.Abs(format.Equals("short") ? realVer - 16440 : realVer);
 
             tmp.text = Plugin.Config.VERSION_TEXT;
             tmp.fontSize = tmp.fontSizeMin = 22f;

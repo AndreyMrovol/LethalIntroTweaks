@@ -34,3 +34,8 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 - Added config options (X, Y) to move the position of the version text. 
 - Setting the anchor position of version text is now done once instead of every frame.
 - Version text now ONLY shows on the main menu. Not settings, credits etc.
+
+### v1.2.1
+- Added config option to toggle the version text. Credit - RectangularObject.
+- BepinExPack now specified as a dependency.
+- New VCR-style icon.

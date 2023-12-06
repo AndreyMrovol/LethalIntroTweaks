@@ -17,8 +17,12 @@ namespace IntroTweaks.Core {
 
         public bool CUSTOM_VERSION_TEXT { get; private set; }
         public string VERSION_TEXT { get; private set; }
+        public string VERSION_TEXT_FORMAT { get; private set; }
+        public float VERSION_TEXT_SIZE { get; private set; }
         public float VERSION_TEXT_X { get; private set; }
         public float VERSION_TEXT_Y { get; private set; }
+
+        public bool DISABLE_FIRST_DAY_SFX { get; private set; }
 
         public PluginConfig(ConfigFile cfg) {
             configFile = cfg;
@@ -56,6 +60,13 @@ namespace IntroTweaks.Core {
                 "To insert the version number, use the $VERSION syntax. E.g. Ver69 would be Ver$VERSION"
             );
 
+            VERSION_TEXT_FORMAT = NewEntry("sVersionTextFormat", "FULL",
+                "Determines how to display game version number.\n" +
+                "Valid options: FULL, SHORT"
+            );
+
+            VERSION_TEXT_SIZE = NewEntry("fVersionTextSize", 20f, "The font size of the version text.");
+
             VERSION_TEXT_X = NewEntry("fVersionTextXPos", 1089.9f,
                 "The position on the horizontal axis where the version text should be placed.\n" +
                 "Positive = Right, Negative = Left"
@@ -65,6 +76,8 @@ namespace IntroTweaks.Core {
                 "The position on the vertical axis where the version text should be placed.\n" +
                 "Positive = Up, Negative = Down"
             );
+
+            DISABLE_FIRST_DAY_SFX = NewEntry("bDisableFirstDaySFX", true, "Toggles the first day ship speaker SFX.");
         }
     }
 }

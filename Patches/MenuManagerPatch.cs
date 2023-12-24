@@ -1,6 +1,8 @@
 using HarmonyLib;
+using System;
 using TMPro;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace IntroTweaks.Patches {
     [HarmonyPatch(typeof(MenuManager))]
@@ -27,8 +29,12 @@ namespace IntroTweaks.Patches {
 
                 clone.name = "VersionNumberText";
 
-                versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-                AnchorToBottom(clone.GetComponent<RectTransform>());
+                try {
+                    versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
+                    AnchorToBottom(clone.GetComponent<RectTransform>());
+                } catch(Exception e) {
+                    Plugin.Logger.LogError($"Error setting version text!\n{e}");
+                }
             }
 
             return true;
@@ -38,17 +44,17 @@ namespace IntroTweaks.Patches {
         [HarmonyPatch("Start")]
         static void StartPatch(MenuManager __instance) {
             if (Plugin.Config.REMOVE_NEWS_PANEL) {
-                Object.Destroy(__instance.NewsPanel);
+                __instance.NewsPanel.SetActive(false);
             }
 
             if (Plugin.Config.REMOVE_LAN_WARNING) {
-                Object.Destroy(__instance.lanWarningContainer);
+                __instance.lanWarningContainer.SetActive(false);
             }
 
             if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN) {
                 GameObject lanModeText = __instance.launchedInLanModeText?.transform.gameObject;
                 if (lanModeText) {
-                    Object.Destroy(lanModeText);
+                    lanModeText.SetActive(false);
                 }
             }
 

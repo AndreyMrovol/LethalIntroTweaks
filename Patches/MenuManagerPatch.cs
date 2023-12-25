@@ -133,9 +133,6 @@ namespace IntroTweaks.Patches {
 
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.pixelPerfect = true;
-
-            // TODO: Target display stuff
-
         }
 
         static void FixPanelAlignment(GameObject panel) {

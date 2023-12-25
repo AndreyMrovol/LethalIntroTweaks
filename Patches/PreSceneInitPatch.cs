@@ -1,5 +1,4 @@
 using HarmonyLib;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace IntroTweaks.Patches {

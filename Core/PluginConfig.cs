@@ -6,6 +6,8 @@ namespace IntroTweaks.Core {
 
         public bool PLUGIN_ENABLED { get; private set; }
 
+        public int GAME_STARTUP_DISPLAY { get; private set; }
+
         public string AUTO_SELECT_MODE { get; private set; }
         public bool AUTO_SELECT_HOST { get; private set; }
 
@@ -34,6 +36,12 @@ namespace IntroTweaks.Core {
         }
 
         public void InitBindings() {
+            GAME_STARTUP_DISPLAY = NewEntry("iGameStartupDisplay", 0, 
+                "The index of the monitor to display the game on when starting.\n" +
+                "You can find these indexes in your Windows display settings.\n" +
+                "Defaults to 0 (main monitor)."
+            );
+
             AUTO_SELECT_MODE = NewEntry("sAutoSelectMode", "ONLINE",
                 "Which mode to automatically enter into after the splash screen.\n" +
                 "Valid options: ONLINE, LAN, OFF"

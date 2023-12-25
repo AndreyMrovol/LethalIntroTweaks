@@ -1,4 +1,5 @@
 using HarmonyLib;
+using IntroTweaks.Utils;
 using UnityEngine.SceneManagement;
 
 namespace IntroTweaks.Patches {
@@ -7,6 +8,8 @@ namespace IntroTweaks.Patches {
         [HarmonyPrefix]
         [HarmonyPatch("Start")]
         static void DisableBootAnimation(ref bool __runOriginal) {
+            DisplayUtil.Move(Plugin.Config.GAME_STARTUP_DISPLAY);
+
             if (Plugin.Config.SKIP_BOOT_ANIMATION) {
                 SceneManager.LoadScene("MainMenu");
                 __runOriginal = false;

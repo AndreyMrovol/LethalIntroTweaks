@@ -1,9 +1,8 @@
 using HarmonyLib;
 using System;
-
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace IntroTweaks.Patches {
@@ -11,6 +10,7 @@ namespace IntroTweaks.Patches {
     internal class MenuManagerPatch {
         public static int gameVer { get; private set; }
         public static TextMeshProUGUI versionText { get; private set; }
+        public static List<GameObject> menuButtons { get; private set; }
 
         [HarmonyPrefix]
         [HarmonyPatch("ClickHostButton")]
@@ -25,9 +25,9 @@ namespace IntroTweaks.Patches {
         [HarmonyPatch("Awake")]
         static bool ReplaceVersionText(MenuManager __instance) {
             if (Plugin.Config.CUSTOM_VERSION_TEXT) {
-                GameObject original = __instance.versionNumberText?.transform.gameObject;
+                GameObject original = __instance.menuButtons?.transform.parent.Find("VersionNum").gameObject;
                 if (!original) {
-                    Plugin.Logger.LogError("Reference to `versionNumberText` is null!");
+                    Plugin.Logger.LogError("Failed to find original version text object.");
                 }
 
                 try {
@@ -38,7 +38,8 @@ namespace IntroTweaks.Patches {
 
                     versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
                     AnchorToBottom(clone.GetComponent<RectTransform>());
-                } catch(Exception e) {
+                }
+                catch (Exception e) {
                     Plugin.Logger.LogError($"Error creating custom version text!\n{e}");
                 }
             }
@@ -50,16 +51,21 @@ namespace IntroTweaks.Patches {
         [HarmonyPatch("Start")]
         static void StartPatch(MenuManager __instance) {
             try {
-                GameObject[] buttons = [
-                    GetButton(__instance.menuButtons, "HostButton"),
+                // Make the white space equal on both sides of the panel.
+                FixPanelAlignment(__instance.menuButtons);
+                TweakCanvasSettings(__instance.menuButtons);
+
+                menuButtons = [
+                    __instance.joinCrewButtonContainer,
                     __instance.lanButtonContainer,
+                    GetButton(__instance.menuButtons, "HostButton"),
                     GetButton(__instance.menuButtons, "SettingsButton"),
                     GetButton(__instance.menuButtons, "Credits"),
                     GetButton(__instance.menuButtons, "QuitButton")
                 ];
 
-                FixPanelAlignment(__instance.menuButtons);
-                AlignButtons(buttons);
+                // Make the messy menu buttons aligned with each other.
+                AlignButtons(menuButtons);
             } catch(Exception e) {
                 Plugin.Logger.LogError(e);
             }
@@ -121,29 +127,37 @@ namespace IntroTweaks.Patches {
             );
         }
 
+        static void TweakCanvasSettings(GameObject panel) {
+            // This is more future-proof than `panel.transform.parent.parent`.
+            var canvas = panel.GetComponentInParent<Canvas>(); 
+
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.pixelPerfect = true;
+
+            // TODO: Target display stuff
+
+        }
+
         static void FixPanelAlignment(GameObject panel) {
-            // Make the white space equal on both sides of the panel.
             var panelRect = panel.GetComponent<RectTransform>();
- 
+
             panelRect.anchoredPosition = Vector2.zero;
             panelRect.anchoredPosition3D = Vector3.zero;
 
-            var panelPos = panelRect.position;
-            panelRect.position = new Vector3(panelPos.x + 2, panelPos.y, panelPos.z);
+            Plugin.Logger.LogDebug("Fixed menu panel alignment.");
         }
 
-        static void AlignButtons(GameObject[] buttons) {
-            // Align the messy menu buttons with each other.
-            foreach (GameObject button in buttons) {
-                var rect = button.GetComponent<RectTransform>();
+        static void AlignButtons(IEnumerable<GameObject> buttons) {
+            foreach (GameObject obj in buttons) {
+                TextMeshProUGUI text = obj.GetComponent<TextMeshProUGUI>();
+                text.wordSpacing -= 25;
+                text.fontStyle = FontStyles.UpperCase;
+                text.overflowMode = TextOverflowModes.Overflow;
 
-                rect.anchoredPosition = Vector2Int.FloorToInt(rect.anchoredPosition);
-                rect.anchoredPosition3D = Vector3Int.FloorToInt(rect.anchoredPosition3D);
-
-                Vector3 buttonPos = rect.position;
-                int newX = (int) Math.Floor(buttonPos.x);
-
-                rect.position = new Vector3(newX, buttonPos.y, buttonPos.z);
+                RectTransform rect = obj.GetComponent<RectTransform>();
+                rect.pivot = Vector2.zero;
+                rect.anchoredPosition = new Vector2(175, rect.anchoredPosition.y);
+                rect.offsetMax = new Vector2(rect.offsetMax.x - 5, rect.offsetMax.y);
             }
 
             Plugin.Logger.LogDebug("Aligned menu buttons.");

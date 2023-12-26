@@ -45,3 +45,18 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 - Added config option `sVersionTextFormat` to display either the full game version or a shortened one.
 - Added config option `fVersionTextSize` to control the font size of the version text.
 - Fixed custom version text not showing - it was accidentally off by default (oops).
+
+### v1.3.0
+- Centered the menu panel so the whitespace at the edges are equal. (OCD havers rejoice)
+- Menu buttons are now aligned with each other and will overflow instead of wrap.
+- Menu canvas now has the correct settings that a menu should have.
+    - **Render Mode**: Screen Space Overlay
+    - **Pixel Perfect**: true
+
+<p><p>
+
+- Added a back button to use when stuck loading into a lobby.
+- Added new config option `iGameStartupDisplay` to control which monitor the game is displayed on when starting.
+- Removing UI elements now sets them to inactive. Destroying them is bad practice.
+- Added try-catch blocks in multiple places to make future debugging easier.
+- Fixed a null reference exception when trying to clone the version text.

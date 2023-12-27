@@ -56,6 +56,7 @@ namespace IntroTweaks.Patches {
                 // Make the white space equal on both sides of the panel.
                 FixPanelAlignment(__instance.menuButtons);
                 TweakCanvasSettings(__instance.menuButtons);
+                TweakHostPanel(__instance.HostSettingsScreen);
 
                 menuButtons = [
                     __instance.joinCrewButtonContainer,
@@ -137,11 +138,22 @@ namespace IntroTweaks.Patches {
             canvas.pixelPerfect = true;
         }
 
+        static void TweakHostPanel(GameObject panel) {
+            var rect = panel.GetComponent<RectTransform>();
+            rect.anchoredPosition = Vector2.zero;
+            rect.anchoredPosition3D = Vector3.zero;
+
+            panel.transform.Find("Image").gameObject.SetActive(false);
+        }
+
         static void FixPanelAlignment(GameObject panel) {
             var panelRect = panel.GetComponent<RectTransform>();
 
             panelRect.anchoredPosition = Vector2.zero;
             panelRect.anchoredPosition3D = Vector3.zero;
+
+            panelRect.offsetMax = new Vector2(-20, -20);
+            panelRect.offsetMin = new Vector2(20, 20);
 
             Plugin.Logger.LogDebug("Fixed menu panel alignment.");
         }
@@ -154,9 +166,15 @@ namespace IntroTweaks.Patches {
                 rect.offsetMax = new Vector2(rect.offsetMax.x - 5, rect.offsetMax.y);
 
                 TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
-                text.wordSpacing -= 25;
+
                 //text.fontStyle = FontStyles.UpperCase;
+                text.wordSpacing -= 25;
+
                 text.overflowMode = TextOverflowModes.Overflow;
+                text.enableWordWrapping = false;
+
+                text.color = new Color(0, 0, 0, 0);
+                text.faceColor = new Color(210, 105, 0, 255);
             }
 
             Plugin.Logger.LogDebug("Aligned menu buttons.");

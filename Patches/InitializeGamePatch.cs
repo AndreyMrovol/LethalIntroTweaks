@@ -8,7 +8,10 @@ namespace IntroTweaks.Patches {
         [HarmonyPrefix]
         [HarmonyPatch("Start")]
         static void DisableBootAnimation(ref bool __runOriginal) {
-            DisplayUtil.Move(Plugin.Config.GAME_STARTUP_DISPLAY);
+            int startupDisplayIndex = Plugin.Config.GAME_STARTUP_DISPLAY;
+            if (startupDisplayIndex >= 0) {
+                DisplayUtil.Move(startupDisplayIndex);
+            }
 
             if (Plugin.Config.SKIP_BOOT_ANIMATION) {
                 SceneManager.LoadScene("MainMenu");

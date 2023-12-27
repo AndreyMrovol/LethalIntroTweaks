@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -11,10 +10,8 @@ namespace IntroTweaks.Utils {
             // Update `Displays` with current layout.
             Screen.GetDisplayLayout(Displays);
 
-            Plugin.Logger.LogDebug($"Selected monitor: {displayIndex}");
-
-            string layoutStr = string.Join("\n", Displays.Select(d => d.name + " - " + d.refreshRate));
-            Plugin.Logger.LogDebug($"Current display layout:\n{layoutStr}");
+            //string layoutStr = string.Join("\n", Displays.Select(d => d.name + " - " + d.refreshRate));
+            //Plugin.Logger.LogDebug($"Current display layout:\n{layoutStr}");
 
             // No need to move if same monitor.
             int currentMonitor = Displays.IndexOf(Screen.mainWindowDisplayInfo);
@@ -28,17 +25,18 @@ namespace IntroTweaks.Utils {
         }
 
         static async Task MoveWindowTask(int index) {
-            // Out of bounds, end the task.
+            #region Out of bounds, end the task.
             if (index >= Displays.Count) {
                 await Task.CompletedTask;
 
                 Plugin.Logger.LogDebug("Display index out of bounds for current layout!");
                 return;
             }
+            #endregion
 
-            #region Grab display and position
+            #region Grab display and position.
             DisplayInfo display = Displays[index];
-            Vector2Int screenPos = new(0, 0); // Top left
+            Vector2Int screenPos = Vector2Int.zero;
 
             if (Screen.fullScreenMode != FullScreenMode.Windowed) {
                 screenPos.x += display.width / 2;
@@ -46,10 +44,14 @@ namespace IntroTweaks.Utils {
             }
             #endregion
 
+            #region Do screen move operation.
             AsyncOperation operation = Screen.MoveMainWindowTo(display, screenPos);
             while (operation.progress < 1f) {
                 await Task.Yield();
             }
+
+            Plugin.Logger.LogDebug($"Game moved to display: {Displays[index].name}");
+            #endregion
         }
     }
 }

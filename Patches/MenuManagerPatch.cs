@@ -13,10 +13,7 @@ namespace IntroTweaks.Patches {
         public static TextMeshProUGUI versionText { get; private set; }
 
         public static List<GameObject> menuButtons { get; private set; }
-        static Button cancelLoadingButton;
-
-        static MenuManager Instance;
-
+ 
         [HarmonyPrefix]
         [HarmonyPatch("ClickHostButton")]
         static void DisableMenuOnHost(MenuManager __instance) {
@@ -24,44 +21,6 @@ namespace IntroTweaks.Patches {
             if (Plugin.Config.CUSTOM_VERSION_TEXT) {
                 versionText.transform.gameObject.SetActive(false);
             }
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch("SetLoadingScreen")]
-        static void AddLoadingScreenBackButton(MenuManager __instance, ref bool isLoading) {
-            if (!isLoading) return;
-
-            try {
-                __instance.loadingScreen.SetActive(true);
-                cancelLoadingButton.gameObject.SetActive(true);
-            } catch (Exception e) {
-                Plugin.Logger.LogError(e);
-            }
-        }
-
-        static void InitCancelLoadingButton(MenuManager instance) {
-            GameObject original = GetButton(instance.menuButtons, "QuitButton");
-            if (!original) {
-                Plugin.Logger.LogError("Failed to find original version text object.");
-            }
-
-            GameObject clone = Object.Instantiate(original, instance.loadingScreen.transform);
-            clone.name = "LoadingScreenBackButton";
-
-            cancelLoadingButton = clone.GetComponent<Button>();
-            cancelLoadingButton.onClick.RemoveAllListeners();
-            cancelLoadingButton.onClick.AddListener(LoadingScreenBackButtonClick);
-
-            clone.GetComponentInChildren<TextMeshProUGUI>().text = "> Cancel";
-        }
-
-        static void LoadingScreenBackButtonClick() {
-            Instance.MenuAudio.volume = 0.5f;
-            Instance.menuButtons.SetActive(true);
-            Instance.loadingScreen.SetActive(false);
-            Instance.serverListUIContainer.SetActive(false);
-
-            // TODO: Somehow prevent lobby from loading.
         }
 
         [HarmonyPrefix]
@@ -93,9 +52,6 @@ namespace IntroTweaks.Patches {
         [HarmonyPostfix]
         [HarmonyPatch("Start")]
         static void StartPatch(MenuManager __instance) {
-            Instance = __instance;
-            InitCancelLoadingButton(__instance);
-
             try {
                 // Make the white space equal on both sides of the panel.
                 FixPanelAlignment(__instance.menuButtons);

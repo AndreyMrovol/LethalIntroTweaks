@@ -55,8 +55,7 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 
 <p><p>
 
-- Added a back button to use when stuck loading into a lobby.
-- Added new config option `iGameStartupDisplay` to control which monitor the game is displayed on when starting.
+- Added new config option `iGameStartupDisplay` to control which monitor the game is displayed on when starting (after the splash screen).
 - Removing UI elements now sets them to inactive. Destroying them is bad practice.
 - Added try-catch blocks in multiple places to make future debugging easier.
 - Fixed a null reference exception when trying to clone the version text.

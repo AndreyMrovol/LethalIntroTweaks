@@ -1,9 +1,9 @@
 using HarmonyLib;
+using IntroTweaks.Utils;
 using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace IntroTweaks.Patches {
@@ -13,6 +13,9 @@ namespace IntroTweaks.Patches {
         public static TextMeshProUGUI versionText { get; private set; }
 
         public static List<GameObject> menuButtons { get; private set; }
+
+        public static Color32 WHITE = new(0, 0, 0, 0);
+        public static Color32 DARK_ORANGE = new(185, 120, 0, 255);
  
         [HarmonyPrefix]
         [HarmonyPatch("ClickHostButton")]
@@ -39,7 +42,7 @@ namespace IntroTweaks.Patches {
                     clone.name = "VersionNumberText";
 
                     versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-                    AnchorToBottom(clone.GetComponent<RectTransform>());
+                    RectUtil.AnchorToBottom(clone.GetComponent<RectTransform>());
                 }
                 catch (Exception e) {
                     Plugin.Logger.LogError($"Error creating custom version text!\n{e}");
@@ -110,24 +113,18 @@ namespace IntroTweaks.Patches {
             tmp.text = Plugin.Config.VERSION_TEXT;
             tmp.fontSize = Mathf.Clamp(Plugin.Config.VERSION_TEXT_SIZE, 10, 40);
             tmp.alignment = TextAlignmentOptions.Center;
-            tmp.enableWordWrapping = false;
+
+            TweakTextSettings(tmp);
 
             return tmp;
         }
 
-        static void AnchorToBottom(RectTransform rect) {
-            rect.anchorMin = new Vector2(0.5f, 0);
-            rect.anchorMax = new Vector2(0.5f, 0);
+        static void TweakTextSettings(TextMeshProUGUI tmp, bool overflow = true, bool wordWrap = false) {
+            if (overflow) tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.enableWordWrapping = wordWrap;
 
-            rect.anchoredPosition = Vector2.zero;
-            rect.anchoredPosition3D = Vector3.zero;
-
-            rect.rotation = Quaternion.identity;
-            rect.position = new Vector3(
-                Plugin.Config.VERSION_TEXT_X, 
-                Plugin.Config.VERSION_TEXT_Y, 
-                -37
-            );
+            tmp.faceColor = DARK_ORANGE;
+            tmp.color = WHITE;
         }
 
         static void TweakCanvasSettings(GameObject panel) {
@@ -140,20 +137,17 @@ namespace IntroTweaks.Patches {
 
         static void TweakHostPanel(GameObject panel) {
             var rect = panel.GetComponent<RectTransform>();
-            rect.anchoredPosition = Vector2.zero;
-            rect.anchoredPosition3D = Vector3.zero;
+            RectUtil.ResetAnchoredPos(rect);
 
             panel.transform.Find("Image").gameObject.SetActive(false);
         }
 
         static void FixPanelAlignment(GameObject panel) {
-            var panelRect = panel.GetComponent<RectTransform>();
+            var rect = panel.GetComponent<RectTransform>();
 
-            panelRect.anchoredPosition = Vector2.zero;
-            panelRect.anchoredPosition3D = Vector3.zero;
-
-            panelRect.offsetMax = new Vector2(-20, -20);
-            panelRect.offsetMin = new Vector2(20, 20);
+            RectUtil.EditOffsets(rect, new(-20, -20), new(20, 20));
+            RectUtil.ResetAnchoredPos(rect);
+            RectUtil.ResetSizeDelta(rect);
 
             Plugin.Logger.LogDebug("Fixed menu panel alignment.");
         }
@@ -161,20 +155,16 @@ namespace IntroTweaks.Patches {
         static void AlignButtons(IEnumerable<GameObject> buttons) {
             foreach (GameObject obj in buttons) {
                 RectTransform rect = obj.GetComponent<RectTransform>();
-                rect.pivot = Vector2.zero;
-                rect.anchoredPosition = new Vector2(50, rect.anchoredPosition.y + 2);
-                rect.offsetMax = new Vector2(rect.offsetMax.x - 5, rect.offsetMax.y);
+
+                RectUtil.ResetPivot(rect);
+                RectUtil.EditOffsets(rect, new(rect.offsetMax.x -5, rect.offsetMax.y), rect.offsetMin);
+                rect.anchoredPosition = new(50, rect.anchoredPosition.y + 2);
 
                 TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
+                TweakTextSettings(text);
 
-                //text.fontStyle = FontStyles.UpperCase;
                 text.wordSpacing -= 25;
-
-                text.overflowMode = TextOverflowModes.Overflow;
-                text.enableWordWrapping = false;
-
-                text.color = new Color(0, 0, 0, 0);
-                text.faceColor = new Color(210, 105, 0, 255);
+                //text.fontStyle = FontStyles.UpperCase;
             }
 
             Plugin.Logger.LogDebug("Aligned menu buttons.");

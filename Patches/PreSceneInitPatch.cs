@@ -18,7 +18,7 @@ namespace IntroTweaks.Patches {
             }
 
             #region Auto-skip
-            __instance.LaunchSettingsPanels.Do(p => p.gameObject.SetActive(false));
+            __instance.LaunchSettingsPanels.Do(panel => panel.SetActive(false));
             __instance.currentLaunchSettingPanel = 0;
             __instance.headerText.text = "";
             __instance.blackTransition.gameObject.SetActive(false);

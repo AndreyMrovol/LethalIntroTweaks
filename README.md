@@ -60,7 +60,7 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 <p><p>
 
 - Added new config option `iGameStartupDisplay` to control which monitor the game is displayed on when starting (after the splash screen).
-    > Any negative value will disable this setting.
+    > Any negative value will disable this setting.<br>
     > Defaults to `0` - the main display.
 
 **Fixes**

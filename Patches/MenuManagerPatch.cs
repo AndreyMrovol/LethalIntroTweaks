@@ -158,25 +158,31 @@ namespace IntroTweaks.Patches {
 
         static void AlignButtons(IEnumerable<GameObject> buttons) {
             foreach (GameObject obj in buttons) {
+                #region Fix button rect
                 RectTransform rect = obj.GetComponent<RectTransform>();
 
                 RectUtil.ResetPivot(rect);
                 rect.anchoredPosition = new(50, rect.anchoredPosition.y + 2);
                 rect.offsetMax = new(rect.offsetMax.x -5, rect.offsetMax.y);
+                #endregion
 
+                #region Fix text mesh settings
                 TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
 
-                TweakTextSettings(text);
                 FixScale(text.gameObject);
-
-                var textRect = text.gameObject.GetComponent<RectTransform>();
-                RectUtil.ResetAnchoredPos(textRect);
-                RectUtil.ResetSizeDelta(textRect);
-                RectUtil.EditOffsets(textRect, Vector2.zero, new(5, 0));
+                TweakTextSettings(text);
 
                 text.fontSize = 15;
                 text.wordSpacing -= 25;
                 //text.fontStyle = FontStyles.UpperCase;
+                #endregion
+
+                #region Fix button text rect
+                var textRect = text.gameObject.GetComponent<RectTransform>();
+                RectUtil.ResetAnchoredPos(textRect);
+                RectUtil.ResetSizeDelta(textRect);
+                RectUtil.EditOffsets(textRect, Vector2.zero, new(5, 0));
+                #endregion
             }
 
             Plugin.Logger.LogDebug("Aligned menu buttons.");

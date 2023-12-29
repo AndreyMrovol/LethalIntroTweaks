@@ -6,8 +6,11 @@ namespace IntroTweaks.Patches {
     internal class PreSceneInitPatch {
         [HarmonyPrefix]
         [HarmonyPatch("SkipToFinalSetting")]
-        static bool OverrideSkipToFinal() {
-            return false;
+        static bool DisableTransition(PreInitSceneScript __instance) {
+            bool finishedSetup = IngamePlayerSettings.Instance.settings.playerHasFinishedSetup;
+            if (finishedSetup) __instance.blackTransition.gameObject.SetActive(false);
+
+            return finishedSetup;
         }
 
         [HarmonyPostfix]
@@ -18,7 +21,7 @@ namespace IntroTweaks.Patches {
             }
 
             #region Auto-skip
-            __instance.LaunchSettingsPanels.Do(p => p.gameObject.SetActive(false));
+            __instance.LaunchSettingsPanels.Do(panel => panel.SetActive(false));
             __instance.currentLaunchSettingPanel = 0;
             __instance.headerText.text = "";
             __instance.blackTransition.gameObject.SetActive(false);

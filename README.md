@@ -50,13 +50,21 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 - Centered the menu panel so the whitespace at the edges are equal. (OCD havers rejoice)
 - Menu buttons are now aligned with each other and will overflow instead of wrap.
 - Menu canvas now has the correct settings that a menu should have.
-    - **Render Mode**: Screen Space Overlay
     - **Pixel Perfect**: true
-
+    - **Render Mode**: Screen Space Overlay
+    > This means changing brightness no longer affects menu elements.
+    
 <p><p>
 
-- Added a back button to use when stuck loading into a lobby.
-- Added new config option `iGameStartupDisplay` to control which monitor the game is displayed on when starting.
+- Added new config option `iGameStartupDisplay` to control which monitor the game is displayed on when starting (after the splash screen).
+    > Any negative value will disable this setting.
+    > Defaults to `0` - the main display.
+
+**Fixes**
+- Fixed alignment/scale of all menu panels (host, server list, loading screen) so it looks less jarring to swap between them.
+- Fixed issue where setting `sAutoSelectMode` to `OFF` would cause the brightness and mic screens to show even after the first game boot.
+- Fixed a null reference exception when trying to clone the version text.
+
+**Misc**
 - Removing UI elements now sets them to inactive. Destroying them is bad practice.
 - Added try-catch blocks in multiple places to make future debugging easier.
-- Fixed a null reference exception when trying to clone the version text.

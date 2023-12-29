@@ -1,9 +1,9 @@
 using HarmonyLib;
+using IntroTweaks.Utils;
 using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace IntroTweaks.Patches {
@@ -13,56 +13,8 @@ namespace IntroTweaks.Patches {
         public static TextMeshProUGUI versionText { get; private set; }
 
         public static List<GameObject> menuButtons { get; private set; }
-        static Button cancelLoadingButton;
 
-        static MenuManager Instance;
-
-        [HarmonyPrefix]
-        [HarmonyPatch("ClickHostButton")]
-        static void DisableMenuOnHost(MenuManager __instance) {
-            __instance.menuButtons.SetActive(false);
-            if (Plugin.Config.CUSTOM_VERSION_TEXT) {
-                versionText.transform.gameObject.SetActive(false);
-            }
-        }
-
-        [HarmonyPostfix]
-        [HarmonyPatch("SetLoadingScreen")]
-        static void AddLoadingScreenBackButton(MenuManager __instance, ref bool isLoading) {
-            if (!isLoading) return;
-
-            try {
-                __instance.loadingScreen.SetActive(true);
-                cancelLoadingButton.gameObject.SetActive(true);
-            } catch (Exception e) {
-                Plugin.Logger.LogError(e);
-            }
-        }
-
-        static void InitCancelLoadingButton(MenuManager instance) {
-            GameObject original = GetButton(instance.menuButtons, "QuitButton");
-            if (!original) {
-                Plugin.Logger.LogError("Failed to find original version text object.");
-            }
-
-            GameObject clone = Object.Instantiate(original, instance.loadingScreen.transform);
-            clone.name = "LoadingScreenBackButton";
-
-            cancelLoadingButton = clone.GetComponent<Button>();
-            cancelLoadingButton.onClick.RemoveAllListeners();
-            cancelLoadingButton.onClick.AddListener(LoadingScreenBackButtonClick);
-
-            clone.GetComponentInChildren<TextMeshProUGUI>().text = "> Cancel";
-        }
-
-        static void LoadingScreenBackButtonClick() {
-            Instance.MenuAudio.volume = 0.5f;
-            Instance.menuButtons.SetActive(true);
-            Instance.loadingScreen.SetActive(false);
-            Instance.serverListUIContainer.SetActive(false);
-
-            // TODO: Somehow prevent lobby from loading.
-        }
+        public static Color32 DARK_ORANGE = new(175, 115, 0, 255);
 
         [HarmonyPrefix]
         [HarmonyPatch("Awake")]
@@ -80,7 +32,7 @@ namespace IntroTweaks.Patches {
                     clone.name = "VersionNumberText";
 
                     versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-                    AnchorToBottom(clone.GetComponent<RectTransform>());
+                    RectUtil.AnchorToBottom(clone.GetComponent<RectTransform>());
                 }
                 catch (Exception e) {
                     Plugin.Logger.LogError($"Error creating custom version text!\n{e}");
@@ -93,13 +45,18 @@ namespace IntroTweaks.Patches {
         [HarmonyPostfix]
         [HarmonyPatch("Start")]
         static void StartPatch(MenuManager __instance) {
-            Instance = __instance;
-            InitCancelLoadingButton(__instance);
-
             try {
                 // Make the white space equal on both sides of the panel.
                 FixPanelAlignment(__instance.menuButtons);
+                FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyHostSettings"));
+                FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyList"));
+                FixPanelAlignment(FindInParent(__instance.menuButtons, "LoadingScreen"));
+
+                // Overlay + Pixel perfect
                 TweakCanvasSettings(__instance.menuButtons);
+                
+                // Disable the red background on the host panel
+                __instance.HostSettingsScreen.transform.Find("Image").gameObject.SetActive(false);
 
                 menuButtons = [
                     __instance.joinCrewButtonContainer,
@@ -145,6 +102,15 @@ namespace IntroTweaks.Patches {
             }
         }
 
+        [HarmonyPrefix]
+        [HarmonyPatch("ClickHostButton")]
+        static void DisableMenuOnHost(MenuManager __instance) {
+            __instance.menuButtons.SetActive(false);
+
+            if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
+            versionText.transform.gameObject.SetActive(false);
+        }
+
         static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {
             int realVer = GameNetworkManager.Instance.gameVersionNum;
             string format = Plugin.Config.VERSION_TEXT_FORMAT.ToLower();
@@ -153,24 +119,17 @@ namespace IntroTweaks.Patches {
             tmp.text = Plugin.Config.VERSION_TEXT;
             tmp.fontSize = Mathf.Clamp(Plugin.Config.VERSION_TEXT_SIZE, 10, 40);
             tmp.alignment = TextAlignmentOptions.Center;
-            tmp.enableWordWrapping = false;
+
+            TweakTextSettings(tmp);
 
             return tmp;
         }
 
-        static void AnchorToBottom(RectTransform rect) {
-            rect.anchorMin = new Vector2(0.5f, 0);
-            rect.anchorMax = new Vector2(0.5f, 0);
+        static void TweakTextSettings(TextMeshProUGUI tmp, bool overflow = true, bool wordWrap = false) {
+            if (overflow) tmp.overflowMode = TextOverflowModes.Overflow;
+            tmp.enableWordWrapping = wordWrap;
 
-            rect.anchoredPosition = Vector2.zero;
-            rect.anchoredPosition3D = Vector3.zero;
-
-            rect.rotation = Quaternion.identity;
-            rect.position = new Vector3(
-                Plugin.Config.VERSION_TEXT_X, 
-                Plugin.Config.VERSION_TEXT_Y, 
-                -37
-            );
+            tmp.faceColor = DARK_ORANGE;
         }
 
         static void TweakCanvasSettings(GameObject panel) {
@@ -182,25 +141,34 @@ namespace IntroTweaks.Patches {
         }
 
         static void FixPanelAlignment(GameObject panel) {
-            var panelRect = panel.GetComponent<RectTransform>();
+            var rect = panel.GetComponent<RectTransform>();
 
-            panelRect.anchoredPosition = Vector2.zero;
-            panelRect.anchoredPosition3D = Vector3.zero;
+            RectUtil.ResetSizeDelta(rect);
+            RectUtil.ResetAnchoredPos(rect);
+            RectUtil.EditOffsets(rect, new(-20, -25), new(20, 25));
+
+            FixScale(panel);
 
             Plugin.Logger.LogDebug("Fixed menu panel alignment.");
+        }
+
+        internal static void FixScale(GameObject obj) {
+            obj.transform.localScale = new(1.02f, 1.06f, 1.02f);
         }
 
         static void AlignButtons(IEnumerable<GameObject> buttons) {
             foreach (GameObject obj in buttons) {
                 RectTransform rect = obj.GetComponent<RectTransform>();
-                rect.pivot = Vector2.zero;
-                rect.anchoredPosition = new Vector2(50, rect.anchoredPosition.y + 2);
-                rect.offsetMax = new Vector2(rect.offsetMax.x - 5, rect.offsetMax.y);
+
+                RectUtil.ResetPivot(rect);
+                rect.anchoredPosition = new(50, rect.anchoredPosition.y + 2);
+                rect.offsetMax = new(rect.offsetMax.x -5, rect.offsetMax.y);
 
                 TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
+                TweakTextSettings(text);
+
                 text.wordSpacing -= 25;
                 //text.fontStyle = FontStyles.UpperCase;
-                text.overflowMode = TextOverflowModes.Overflow;
             }
 
             Plugin.Logger.LogDebug("Aligned menu buttons.");
@@ -211,6 +179,17 @@ namespace IntroTweaks.Patches {
                 return panel.transform.Find(name).gameObject;
             } catch(Exception e) { 
                 Plugin.Logger.LogError($"Error getting button: {name}\n{e}");
+                return null;
+            }
+        }
+
+        static GameObject FindInParent(GameObject child, string name) {
+            Transform parent = child.transform.parent;
+
+            try {
+                return parent.Find(name).gameObject;
+            } catch(Exception e) { 
+                Plugin.Logger.LogError($"Error finding '{name}' in parent: {parent.name}\n{e}");
                 return null;
             }
         }

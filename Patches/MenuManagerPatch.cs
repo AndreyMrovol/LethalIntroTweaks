@@ -165,8 +165,16 @@ namespace IntroTweaks.Patches {
                 rect.offsetMax = new(rect.offsetMax.x -5, rect.offsetMax.y);
 
                 TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
-                TweakTextSettings(text);
 
+                TweakTextSettings(text);
+                FixScale(text.gameObject);
+
+                var textRect = text.gameObject.GetComponent<RectTransform>();
+                RectUtil.ResetAnchoredPos(textRect);
+                RectUtil.ResetSizeDelta(textRect);
+                RectUtil.EditOffsets(textRect, Vector2.zero, new(5, 0));
+
+                text.fontSize = 15;
                 text.wordSpacing -= 25;
                 //text.fontStyle = FontStyles.UpperCase;
             }

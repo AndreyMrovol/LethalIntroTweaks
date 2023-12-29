@@ -14,17 +14,7 @@ namespace IntroTweaks.Patches {
 
         public static List<GameObject> menuButtons { get; private set; }
 
-        public static Color32 WHITE = new(0, 0, 0, 0);
-        public static Color32 DARK_ORANGE = new(185, 120, 0, 255);
- 
-        [HarmonyPrefix]
-        [HarmonyPatch("ClickHostButton")]
-        static void DisableMenuOnHost(MenuManager __instance) {
-            __instance.menuButtons.SetActive(false);
-            if (Plugin.Config.CUSTOM_VERSION_TEXT) {
-                versionText.transform.gameObject.SetActive(false);
-            }
-        }
+        public static Color32 DARK_ORANGE = new(175, 115, 0, 255);
 
         [HarmonyPrefix]
         [HarmonyPatch("Awake")]
@@ -58,8 +48,15 @@ namespace IntroTweaks.Patches {
             try {
                 // Make the white space equal on both sides of the panel.
                 FixPanelAlignment(__instance.menuButtons);
+                FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyHostSettings"));
+                FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyList"));
+                FixPanelAlignment(FindInParent(__instance.menuButtons, "LoadingScreen"));
+
+                // Overlay + Pixel perfect
                 TweakCanvasSettings(__instance.menuButtons);
-                TweakHostPanel(__instance.HostSettingsScreen);
+                
+                // Disable the red background on the host panel
+                __instance.HostSettingsScreen.transform.Find("Image").gameObject.SetActive(false);
 
                 menuButtons = [
                     __instance.joinCrewButtonContainer,
@@ -105,6 +102,15 @@ namespace IntroTweaks.Patches {
             }
         }
 
+        [HarmonyPrefix]
+        [HarmonyPatch("ClickHostButton")]
+        static void DisableMenuOnHost(MenuManager __instance) {
+            __instance.menuButtons.SetActive(false);
+
+            if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
+            versionText.transform.gameObject.SetActive(false);
+        }
+
         static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {
             int realVer = GameNetworkManager.Instance.gameVersionNum;
             string format = Plugin.Config.VERSION_TEXT_FORMAT.ToLower();
@@ -124,7 +130,6 @@ namespace IntroTweaks.Patches {
             tmp.enableWordWrapping = wordWrap;
 
             tmp.faceColor = DARK_ORANGE;
-            tmp.color = WHITE;
         }
 
         static void TweakCanvasSettings(GameObject panel) {
@@ -135,21 +140,20 @@ namespace IntroTweaks.Patches {
             canvas.pixelPerfect = true;
         }
 
-        static void TweakHostPanel(GameObject panel) {
-            var rect = panel.GetComponent<RectTransform>();
-            RectUtil.ResetAnchoredPos(rect);
-
-            panel.transform.Find("Image").gameObject.SetActive(false);
-        }
-
         static void FixPanelAlignment(GameObject panel) {
             var rect = panel.GetComponent<RectTransform>();
 
-            RectUtil.EditOffsets(rect, new(-20, -20), new(20, 20));
-            RectUtil.ResetAnchoredPos(rect);
             RectUtil.ResetSizeDelta(rect);
+            RectUtil.ResetAnchoredPos(rect);
+            RectUtil.EditOffsets(rect, new(-20, -25), new(20, 25));
+
+            FixScale(panel);
 
             Plugin.Logger.LogDebug("Fixed menu panel alignment.");
+        }
+
+        internal static void FixScale(GameObject obj) {
+            obj.transform.localScale = new(1.02f, 1.06f, 1.02f);
         }
 
         static void AlignButtons(IEnumerable<GameObject> buttons) {
@@ -157,8 +161,8 @@ namespace IntroTweaks.Patches {
                 RectTransform rect = obj.GetComponent<RectTransform>();
 
                 RectUtil.ResetPivot(rect);
-                RectUtil.EditOffsets(rect, new(rect.offsetMax.x -5, rect.offsetMax.y), rect.offsetMin);
                 rect.anchoredPosition = new(50, rect.anchoredPosition.y + 2);
+                rect.offsetMax = new(rect.offsetMax.x -5, rect.offsetMax.y);
 
                 TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
                 TweakTextSettings(text);
@@ -175,6 +179,17 @@ namespace IntroTweaks.Patches {
                 return panel.transform.Find(name).gameObject;
             } catch(Exception e) { 
                 Plugin.Logger.LogError($"Error getting button: {name}\n{e}");
+                return null;
+            }
+        }
+
+        static GameObject FindInParent(GameObject child, string name) {
+            Transform parent = child.transform.parent;
+
+            try {
+                return parent.Find(name).gameObject;
+            } catch(Exception e) { 
+                Plugin.Logger.LogError($"Error finding '{name}' in parent: {parent.name}\n{e}");
                 return null;
             }
         }

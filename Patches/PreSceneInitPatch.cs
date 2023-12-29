@@ -6,8 +6,11 @@ namespace IntroTweaks.Patches {
     internal class PreSceneInitPatch {
         [HarmonyPrefix]
         [HarmonyPatch("SkipToFinalSetting")]
-        static bool OverrideSkipToFinal() {
-            return false;
+        static bool DisableTransition(PreInitSceneScript __instance) {
+            bool finishedSetup = IngamePlayerSettings.Instance.settings.playerHasFinishedSetup;
+            if (finishedSetup) __instance.blackTransition.gameObject.SetActive(false);
+
+            return finishedSetup;
         }
 
         [HarmonyPostfix]

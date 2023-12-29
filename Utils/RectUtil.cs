@@ -16,13 +16,13 @@ namespace IntroTweaks.Utils {
         }
 
         internal static void EditOffsets(RectTransform rect, Vector2 max, Vector2 min) {
-            rect.offsetMax = max != null ? max : Vector2.zero;
-            rect.offsetMin = min != null ? min : Vector2.zero;
+            rect.offsetMax = max;
+            rect.offsetMin = min;
         }
 
         internal static void EditAnchors(RectTransform rect, Vector2 max, Vector2 min) {
-            rect.anchorMax = max != null ? max : Vector2.zero;
-            rect.anchorMin = min != null ? min : Vector2.zero;
+            rect.anchorMax = max;
+            rect.anchorMin = min;
         }
 
         internal static void AnchorToBottom(RectTransform rect) {

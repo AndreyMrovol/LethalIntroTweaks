@@ -1,3 +1,5 @@
+<img align="right" width="150" height="150" src="https://gcdn.thunderstore.io/live/repository/icons/Owen3H-IntroTweaks-1.2.2.png.128x128_q95.jpg">
+
 # IntroTweaks
 A configurable, quality of life mod for Lethal Company intro/menu screens.
 
@@ -60,7 +62,7 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 <p><p>
 
 - Added new config option `iGameStartupDisplay` to control which monitor the game is displayed on when starting (after the splash screen).
-    > Any negative value will disable this setting.<br>
+    > Any negative value will disable this setting.
     > Defaults to `0` - the main display.
 
 **Fixes**

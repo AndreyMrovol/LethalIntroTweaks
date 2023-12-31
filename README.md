@@ -79,3 +79,18 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
     - `bAlignMenuButtons` - Defaults to **false**.
     - `bFixMenuCanvas` - Defaults to **false**.
     - `bFixMenuPanels` - Defaults to **true**.
+
+### v1.4.0
+**New Features**
+- Skipped **Unity** and **Zeekerss** splash screens! (Configurable)
+- Removed the main menu 'Credits' button. (Configurable)
+- Buttons now get aligned without requiring `bFixMenuCanvas` to be `true`.
+
+**Mod Compatibility**
+- Moved the **MoreCompany** header image upwards to avoid button overlapping.
+- Moved MoreCompany activate and exit buttons both to the bottom right for intuitiveness.
+- Improved compatibility with both LE and MC (the 3 config options from v1.3.1 are now all `true`).
+
+**Misc**
+- Fixed issue where version text would stay hidden after exiting from a panel back to the menu.
+- Removed unneeded reference to `InputSystem`.

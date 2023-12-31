@@ -26,7 +26,7 @@ namespace IntroTweaks.Core {
         public bool AUTO_SELECT_HOST { get; private set; }
 
         public bool ALIGN_MENU_BUTTONS { get; private set; }
-        public bool FIX_MENU_CANVAS { get; internal set; }
+        public bool FIX_MENU_CANVAS { get; private set; }
         public bool FIX_MENU_PANELS { get; private set; }
 
         public bool REMOVE_LAN_WARNING { get; private set; }

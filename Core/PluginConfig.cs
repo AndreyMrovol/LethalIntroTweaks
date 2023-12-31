@@ -26,7 +26,7 @@ namespace IntroTweaks.Core {
         public bool AUTO_SELECT_HOST { get; private set; }
 
         public bool ALIGN_MENU_BUTTONS { get; private set; }
-        public bool FIX_MENU_CANVAS { get; private set; }
+        public bool FIX_MENU_CANVAS { get; internal set; }
         public bool FIX_MENU_PANELS { get; private set; }
 
         public bool REMOVE_LAN_WARNING { get; private set; }
@@ -85,7 +85,7 @@ namespace IntroTweaks.Core {
                 "If the main menu buttons should align with each other."
             );
 
-            FIX_MENU_CANVAS = NewEntry(Category.MENU_TWEAKS, "bFixMenuCanvas", false, 
+            FIX_MENU_CANVAS = NewEntry(Category.MENU_TWEAKS, "bFixMenuCanvas", true, 
                 "Whether the main menu canvas should have its settings corrected.\n" + 
                 "May cause overlapping issues, only turn it on if you aren't using other menu mods."
             );
@@ -105,6 +105,10 @@ namespace IntroTweaks.Core {
 
             REMOVE_NEWS_PANEL = NewEntry(Category.MENU_TWEAKS, "bRemoveNewsPanel", false, 
                 "Hides the panel that displays news such as game updates."
+            );
+
+            REMOVE_CREDITS_BUTTON = NewEntry(Category.MENU_TWEAKS, "bRemoveCreditsButton", true, 
+                "Hides the 'Credits' button on the main menu. The other buttons are automatically adjusted."
             );
             #endregion
 

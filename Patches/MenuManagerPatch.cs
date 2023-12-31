@@ -2,6 +2,7 @@ using HarmonyLib;
 using IntroTweaks.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -55,32 +56,31 @@ namespace IntroTweaks.Patches {
                     __instance.HostSettingsScreen.transform.Find("Image").gameObject.SetActive(false);
                 }
 
-                // Overlay + Pixel perfect
-                TweakCanvasSettings(__instance.menuButtons);
+                GameObject[] buttons = [
+                    __instance.joinCrewButtonContainer,
+                    __instance.lanButtonContainer,
+                    GetButton(__instance.menuButtons, "HostButton"),
+                    GetButton(__instance.menuButtons, "SettingsButton"),
+                    GetButton(__instance.menuButtons, "Credits"),
+                    GetButton(__instance.menuButtons, "QuitButton"),
+                    GetButton(__instance.menuButtons, "ModSettingsButton")
+                ];
 
                 if (Plugin.Config.ALIGN_MENU_BUTTONS) {
-                    GameObject[] buttons = [
-                        __instance.joinCrewButtonContainer,
-                        __instance.lanButtonContainer,
-                        GetButton(__instance.menuButtons, "HostButton"),
-                        GetButton(__instance.menuButtons, "SettingsButton"),
-                        GetButton(__instance.menuButtons, "Credits"),
-                        GetButton(__instance.menuButtons, "QuitButton"),
-                        GetButton(__instance.menuButtons, "ModSettingsButton")
-                    ];
-
-                    //Plugin.Logger.LogDebug("Buttons targeted for alignment:\n" + string.Join("\n", buttons.Select(b => b.name)));
-
                     AlignButtons(buttons);
                 }
 
-                //if (Plugin.Config.REMOVE_CREDITS_BUTTON) {
-                //    RemoveCreditsButton();
-                //}
+                if (Plugin.Config.REMOVE_CREDITS_BUTTON) {
+                    RemoveCreditsButton(buttons);
+                }
+
+                bool fixCanvas = Plugin.Config.FIX_MENU_CANVAS;
 
                 #region Handle MoreCompany edits if found.
                 GameObject mc = GameObject.Find("GlobalScale");
                 if (mc) {
+                    fixCanvas = false;
+
                     mc.GetComponentInParent<Canvas>().pixelPerfect = true;
                     GameObject cosmetics = mc.transform.Find("CosmeticsScreen").gameObject;
 
@@ -112,6 +112,8 @@ namespace IntroTweaks.Patches {
                     header.position = headerPos;
                     #endregion
                 }
+
+                TweakCanvasSettings(__instance.menuButtons, fixCanvas);
                 #endregion
             }
             catch (Exception e) {
@@ -140,10 +142,15 @@ namespace IntroTweaks.Patches {
 
         [HarmonyPostfix]
         [HarmonyPatch("Update")]
-        static void UpdatePatch() {
+        static void UpdatePatch(MenuManager __instance) {
             // Override version text with game version.
             if (Plugin.Config.CUSTOM_VERSION_TEXT) {
                 versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
+
+                var textObj = versionText.transform.gameObject;
+                if (!textObj.activeSelf && __instance.menuButtons.activeSelf) {
+                    textObj.SetActive(true);
+                }
             }
         }
 
@@ -177,12 +184,12 @@ namespace IntroTweaks.Patches {
             tmp.faceColor = DARK_ORANGE;
         }
 
-        static void TweakCanvasSettings(GameObject panel) {
+        static void TweakCanvasSettings(GameObject panel, bool changeRenderMode) {
             // This is more future-proof than `panel.transform.parent.parent`.
             var canvas = panel.GetComponentInParent<Canvas>();
             canvas.pixelPerfect = true;
 
-            if (Plugin.Config.FIX_MENU_CANVAS) {
+            if (changeRenderMode) {
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             }
         }
@@ -203,8 +210,23 @@ namespace IntroTweaks.Patches {
             obj.transform.localScale = new(1.02f, 1.06f, 1.02f);
         }
 
-        static void RemoveCreditsButton() {
+        static void RemoveCreditsButton(IEnumerable<GameObject> buttons) {
+            GameObject quitButton = buttons.First(b => b.name == "QuitButton");
+            GameObject creditsButton = buttons.First(b => b.name == "Credits");
 
+            // Disable credits button and move quit button there instead.
+            creditsButton.SetActive(false);
+            quitButton.transform.position = creditsButton.transform.position;
+
+            // Move all buttons down slightly.
+            foreach (GameObject obj in buttons) {
+                if (obj == creditsButton) continue;
+
+                var pos = obj.transform.position;
+                obj.transform.position = new(pos.x, pos.y - 10f, pos.z);
+            }
+
+            Plugin.Logger.LogDebug("Removed credits button");
         }
 
         static void AlignButtons(IEnumerable<GameObject> buttons) {

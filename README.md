@@ -72,3 +72,10 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 **Misc**
 - Removing UI elements now sets them to inactive. Destroying them is bad practice.
 - Added try-catch blocks in multiple places to make future debugging easier.
+
+### v1.3.1
+- Config now has categories.
+- Added 3 new config options to help alleviate mod incompatibilities.
+    - `bAlignMenuButtons` - Defaults to **false**.
+    - `bFixMenuCanvas` - Defaults to **false**.
+    - `bFixMenuPanels` - Defaults to **true**.

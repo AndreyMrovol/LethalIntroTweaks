@@ -12,8 +12,6 @@ namespace IntroTweaks.Patches {
         public static int gameVer { get; private set; }
         public static TextMeshProUGUI versionText { get; private set; }
 
-        public static List<GameObject> menuButtons { get; private set; }
-
         public static Color32 DARK_ORANGE = new(175, 115, 0, 255);
 
         [HarmonyPrefix]
@@ -46,29 +44,31 @@ namespace IntroTweaks.Patches {
         [HarmonyPatch("Start")]
         static void StartPatch(MenuManager __instance) {
             try {
-                // Make the white space equal on both sides of the panel.
-                FixPanelAlignment(__instance.menuButtons);
-                FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyHostSettings"));
-                FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyList"));
-                FixPanelAlignment(FindInParent(__instance.menuButtons, "LoadingScreen"));
+                if (Plugin.Config.FIX_MENU_PANELS) {
+                    // Make the white space equal on both sides of the panel.
+                    FixPanelAlignment(__instance.menuButtons);
+                    FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyHostSettings"));
+                    FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyList"));
+                    FixPanelAlignment(FindInParent(__instance.menuButtons, "LoadingScreen"));
+
+                    // Disable the red background on the host panel
+                    __instance.HostSettingsScreen.transform.Find("Image").gameObject.SetActive(false);
+                }
 
                 // Overlay + Pixel perfect
                 TweakCanvasSettings(__instance.menuButtons);
-                
-                // Disable the red background on the host panel
-                __instance.HostSettingsScreen.transform.Find("Image").gameObject.SetActive(false);
 
-                menuButtons = [
-                    __instance.joinCrewButtonContainer,
-                    __instance.lanButtonContainer,
-                    GetButton(__instance.menuButtons, "HostButton"),
-                    GetButton(__instance.menuButtons, "SettingsButton"),
-                    GetButton(__instance.menuButtons, "Credits"),
-                    GetButton(__instance.menuButtons, "QuitButton")
-                ];
-
-                // Make the messy menu buttons aligned with each other.
-                AlignButtons(menuButtons);
+                if (Plugin.Config.ALIGN_MENU_BUTTONS) {
+                    // Make the messy menu buttons align with each other.
+                    AlignButtons([
+                        __instance.joinCrewButtonContainer,
+                        __instance.lanButtonContainer,
+                        GetButton(__instance.menuButtons, "HostButton"),
+                        GetButton(__instance.menuButtons, "SettingsButton"),
+                        GetButton(__instance.menuButtons, "Credits"),
+                        GetButton(__instance.menuButtons, "QuitButton")
+                    ]);
+                }
             } catch(Exception e) {
                 Plugin.Logger.LogError(e);
             }
@@ -134,10 +134,12 @@ namespace IntroTweaks.Patches {
 
         static void TweakCanvasSettings(GameObject panel) {
             // This is more future-proof than `panel.transform.parent.parent`.
-            var canvas = panel.GetComponentInParent<Canvas>(); 
-
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            var canvas = panel.GetComponentInParent<Canvas>();
             canvas.pixelPerfect = true;
+
+            if (Plugin.Config.FIX_MENU_CANVAS) {
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            }
         }
 
         static void FixPanelAlignment(GameObject panel) {

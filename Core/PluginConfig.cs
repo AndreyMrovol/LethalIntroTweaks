@@ -50,9 +50,9 @@ namespace IntroTweaks.Core {
             configFile = cfg;
             PLUGIN_ENABLED = NewEntry("bEnabled", true, "Enable or disable the plugin globally.");
 
-            //SKIP_SPLASH_SCREENS = NewEntry(Category.INTRO_TWEAKS, "bSkipSplashScreens", true,
-            //    "Skips those pesky Unity and Zeekers startup logos!"
-            //);
+            SKIP_SPLASH_SCREENS = NewEntry(Category.INTRO_TWEAKS, "bSkipSplashScreens", true,
+                "Skips those pesky Unity and Zeekers startup logos!"
+            );
         }
 
         private T NewEntry<T>(string key, T defaultVal, string desc) {

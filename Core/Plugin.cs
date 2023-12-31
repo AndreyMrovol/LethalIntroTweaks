@@ -24,9 +24,9 @@ namespace IntroTweaks {
             Config = new(base.Config);
 
             if (!PluginEnabled(logDisabled: true)) return;
-
-            if (Config.SKIP_SPLASH_SCREENS) 
+            if (Config.SKIP_SPLASH_SCREENS) {
                 SkipSplashScreen();
+            }
 
             Config.InitBindings();
             SelectedMode = Config.AUTO_SELECT_MODE.ToLower();
@@ -53,8 +53,10 @@ namespace IntroTweaks {
 
         void SkipSplashScreen() {
             Logger.LogDebug("Skipping splash screens. Ew.");
+
             Task.Factory.StartNew(() => {
                 do {
+                    // Not really a 'real' skip, but good enough for the time being.
                     SplashScreen.Stop(StopBehavior.StopImmediate);
                 } while (Time.realtimeSinceStartup < 10);
             });

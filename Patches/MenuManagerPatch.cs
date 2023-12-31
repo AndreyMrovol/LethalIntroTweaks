@@ -59,16 +59,24 @@ namespace IntroTweaks.Patches {
                 TweakCanvasSettings(__instance.menuButtons);
 
                 if (Plugin.Config.ALIGN_MENU_BUTTONS) {
-                    // Make the messy menu buttons align with each other.
-                    AlignButtons([
+                    GameObject[] buttons = [
                         __instance.joinCrewButtonContainer,
                         __instance.lanButtonContainer,
                         GetButton(__instance.menuButtons, "HostButton"),
                         GetButton(__instance.menuButtons, "SettingsButton"),
                         GetButton(__instance.menuButtons, "Credits"),
-                        GetButton(__instance.menuButtons, "QuitButton")
-                    ]);
+                        GetButton(__instance.menuButtons, "QuitButton"),
+                        GetButton(__instance.menuButtons, "ModSettingsButton")
+                    ];
+
+                    //Plugin.Logger.LogDebug("Buttons targeted for alignment:\n" + string.Join("\n", buttons.Select(b => b.name)));
+
+                    AlignButtons(buttons);
                 }
+
+                //if (Plugin.Config.REMOVE_CREDITS_BUTTON) {
+                //    RemoveCreditsButton();
+                //}
 
                 #region Handle MoreCompany edits if found.
                 GameObject mc = GameObject.Find("GlobalScale");
@@ -195,8 +203,14 @@ namespace IntroTweaks.Patches {
             obj.transform.localScale = new(1.02f, 1.06f, 1.02f);
         }
 
+        static void RemoveCreditsButton() {
+
+        }
+
         static void AlignButtons(IEnumerable<GameObject> buttons) {
             foreach (GameObject obj in buttons) {
+                if (!obj) continue;
+
                 #region Fix button rect
                 RectTransform rect = obj.GetComponent<RectTransform>();
 

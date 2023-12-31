@@ -32,6 +32,7 @@ namespace IntroTweaks.Core {
         public bool REMOVE_LAN_WARNING { get; private set; }
         public bool REMOVE_LAUNCHED_IN_LAN { get; private set; }
         public bool REMOVE_NEWS_PANEL { get; private set; }
+        public bool REMOVE_CREDITS_BUTTON { get; private set; }
 
         public bool CUSTOM_VERSION_TEXT { get; private set; }
         public string VERSION_TEXT { get; private set; }
@@ -80,9 +81,8 @@ namespace IntroTweaks.Core {
             #endregion
 
             #region Tweaks to the main menu
-            ALIGN_MENU_BUTTONS = NewEntry(Category.MENU_TWEAKS, "bAlignMenuButtons", false, 
-                "Should the main menu buttons align with each other?\n" + 
-                "Will only take effect when `bFixMenuCanvas` is also enabled."
+            ALIGN_MENU_BUTTONS = NewEntry(Category.MENU_TWEAKS, "bAlignMenuButtons", true, 
+                "If the main menu buttons should align with each other."
             );
 
             FIX_MENU_CANVAS = NewEntry(Category.MENU_TWEAKS, "bFixMenuCanvas", false, 
@@ -92,7 +92,7 @@ namespace IntroTweaks.Core {
 
             FIX_MENU_PANELS = NewEntry(Category.MENU_TWEAKS, "bFixMenuPanels", true, 
                 "The main menu panels (host, servers, loading screen) all have anchoring, offset and sizing issues.\n" +
-                "This option helps solve them and improve the look of the menu.\n\nWILL BREAK SOME MODS."
+                "This option helps solve them and improve the look of the menu.\n\nMAY BREAK SOME MODS."
             );
 
             REMOVE_LAN_WARNING = NewEntry(Category.MENU_TWEAKS, "bRemoveLanWarning", true, 

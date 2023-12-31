@@ -69,7 +69,44 @@ namespace IntroTweaks.Patches {
                         GetButton(__instance.menuButtons, "QuitButton")
                     ]);
                 }
-            } catch(Exception e) {
+
+                #region Handle MoreCompany edits if found.
+                GameObject mc = GameObject.Find("GlobalScale");
+                if (mc) {
+                    mc.GetComponentInParent<Canvas>().pixelPerfect = true;
+                    GameObject cosmetics = mc.transform.Find("CosmeticsScreen").gameObject;
+
+                    #region Tweak character spin area.
+                    Transform spinArea = cosmetics.transform.Find("SpinAreaButton").transform;
+                    spinArea.localScale = new(0.48f, 0.55f, 0.46f);
+                    spinArea.position = new(421.65f, 245.7f, 200f);
+                    #endregion
+
+                    #region Button pos and bring to front.
+                    Transform activate = FindInParent(cosmetics, "ActivateButton").transform;
+                    Transform exit = cosmetics.transform.Find("ExitButton").transform;
+
+                    Vector3 buttonPos = new(424.06f, 241.65f, 166.2f);
+                    exit.position = activate.position = buttonPos;
+                    exit.SetAsLastSibling();
+                    #endregion
+
+                    #region Change cosmetics border scale.
+                    Transform border = cosmetics.transform.Find("CosmeticsHolderBorder").transform;
+                    border.localScale = new(2.4f, 2.1f, 1);
+                    #endregion
+
+                    #region Header scale & position.
+                    Transform header = __instance.menuButtons.transform.Find("HeaderImage").transform;
+                    header.localScale = new Vector3(5, 5, 5);
+
+                    Vector3 headerPos = new(1093.05f, 647.79f, -35.33f);
+                    header.position = headerPos;
+                    #endregion
+                }
+                #endregion
+            }
+            catch (Exception e) {
                 Plugin.Logger.LogError(e);
             }
             

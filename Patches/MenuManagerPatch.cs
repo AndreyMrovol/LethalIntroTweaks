@@ -51,11 +51,14 @@ namespace IntroTweaks.Patches {
                     FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyHostSettings"));
                     FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyList"));
                     FixPanelAlignment(FindInParent(__instance.menuButtons, "LoadingScreen"));
+                }
+                if (Plugin.Config.IMPROVE_HOST_SCREEN) {
+                    // Disable the red background
+                    __instance.HostSettingsScreen.transform.Find("Image").gameObject.SetActive(false);
 
-                    // Disable the red background on the host panel
-                    if (Plugin.Config.IMPROVE_HOST_SCREEN) {
+                    // Increase size of boxes
 
-                    }
+                    // Position boxes to screen center
                 }
 
                 GameObject[] buttons = [

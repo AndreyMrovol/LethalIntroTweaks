@@ -28,6 +28,7 @@ namespace IntroTweaks.Core {
         public bool ALIGN_MENU_BUTTONS { get; private set; }
         public bool FIX_MENU_CANVAS { get; private set; }
         public bool FIX_MENU_PANELS { get; private set; }
+        public bool IMPROVE_HOST_SCREEN { get; private set; }
 
         public bool REMOVE_LAN_WARNING { get; private set; }
         public bool REMOVE_LAUNCHED_IN_LAN { get; private set; }

@@ -242,7 +242,7 @@ namespace IntroTweaks.Patches {
                 RectTransform rect = obj.GetComponent<RectTransform>();
 
                 var yOffset = Plugin.Config.REMOVE_CREDITS_BUTTON ? 20 : -5;
-                rect.localPosition = new Vector3(hostButtonPos.x + 20, rect.localPosition.y + yOffset, hostButtonPos.z);
+                rect.localPosition = new(hostButtonPos.x + 20, rect.localPosition.y + yOffset, hostButtonPos.z);
                 #endregion
 
                 #region Fix text mesh settings

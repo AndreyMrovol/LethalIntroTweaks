@@ -232,8 +232,7 @@ namespace IntroTweaks.Patches {
         }
 
         static void AlignButtons(IEnumerable<GameObject> buttons) {
-            var hostButton = buttons.First(b => b.name == "HostButton").GetComponent<RectTransform>();
-            var hostButtonPos = hostButton.localPosition;
+            var hostButtonPos = buttons.First(b => b.name == "HostButton").GetComponent<RectTransform>().localPosition;
 
             foreach (GameObject obj in buttons) {
                 if (!obj) continue;
@@ -241,7 +240,7 @@ namespace IntroTweaks.Patches {
                 #region Fix button rect
                 RectTransform rect = obj.GetComponent<RectTransform>();
 
-                var yOffset = Plugin.Config.REMOVE_CREDITS_BUTTON ? 20 : -5;
+                int yOffset = Plugin.Config.REMOVE_CREDITS_BUTTON ? 20 : -5;
                 rect.localPosition = new(hostButtonPos.x + 20, rect.localPosition.y + yOffset, hostButtonPos.z);
                 #endregion
 

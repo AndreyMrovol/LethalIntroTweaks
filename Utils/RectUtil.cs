@@ -32,7 +32,7 @@ namespace IntroTweaks.Utils {
             rect.rotation = Quaternion.identity;
             rect.position = new Vector3(
                 Plugin.Config.VERSION_TEXT_X, 
-                Plugin.Config.VERSION_TEXT_Y, 
+                Plugin.Config.VERSION_TEXT_Y,
                 -37
             );
         }

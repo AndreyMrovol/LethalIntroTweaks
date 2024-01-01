@@ -131,12 +131,12 @@ namespace IntroTweaks.Core {
                 "The font size of the version text. Min = 10, Max = 40."
             );
 
-            VERSION_TEXT_X = NewEntry(Category.VERSION_TEXT, "fVersionTextXPos", 1089.86f,
+            VERSION_TEXT_X = NewEntry(Category.VERSION_TEXT, "fVersionTextXPos", 1089.6f,
                 "The position on the horizontal axis where the version text should be placed.\n" +
                 "Positive = Right, Negative = Left"
             );
 
-            VERSION_TEXT_Y = NewEntry(Category.VERSION_TEXT, "fVersionTextYPos", 555f,
+            VERSION_TEXT_Y = NewEntry(Category.VERSION_TEXT, "fVersionTextYPos", 554.1f,
                 "The position on the vertical axis where the version text should be placed.\n" +
                 "Positive = Up, Negative = Down"
             );

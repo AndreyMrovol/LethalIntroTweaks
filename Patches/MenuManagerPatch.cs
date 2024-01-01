@@ -53,7 +53,9 @@ namespace IntroTweaks.Patches {
                     FixPanelAlignment(FindInParent(__instance.menuButtons, "LoadingScreen"));
 
                     // Disable the red background on the host panel
-                    __instance.HostSettingsScreen.transform.Find("Image").gameObject.SetActive(false);
+                    if (Plugin.Config.IMPROVE_HOST_SCREEN) {
+
+                    }
                 }
 
                 GameObject[] buttons = [
@@ -230,15 +232,17 @@ namespace IntroTweaks.Patches {
         }
 
         static void AlignButtons(IEnumerable<GameObject> buttons) {
+            var hostButton = buttons.First(b => b.name == "HostButton").GetComponent<RectTransform>();
+            var hostButtonPos = hostButton.localPosition;
+
             foreach (GameObject obj in buttons) {
                 if (!obj) continue;
 
                 #region Fix button rect
                 RectTransform rect = obj.GetComponent<RectTransform>();
 
-                RectUtil.ResetPivot(rect);
-                rect.anchoredPosition = new(50, rect.anchoredPosition.y + 2);
-                rect.offsetMax = new(rect.offsetMax.x -5, rect.offsetMax.y);
+                var yOffset = Plugin.Config.REMOVE_CREDITS_BUTTON ? 20 : -5;
+                rect.localPosition = new Vector3(hostButtonPos.x + 20, rect.localPosition.y + yOffset, hostButtonPos.z);
                 #endregion
 
                 #region Fix text mesh settings
@@ -267,7 +271,9 @@ namespace IntroTweaks.Patches {
             try {
                 return panel.transform.Find(name).gameObject;
             } catch(Exception e) { 
-                Plugin.Logger.LogError($"Error getting button: {name}\n{e}");
+                if (name != "ModSettingsButton")
+                    Plugin.Logger.LogError($"Error getting button: {name}\n{e}");
+
                 return null;
             }
         }

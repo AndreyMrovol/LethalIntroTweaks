@@ -15,6 +15,8 @@ namespace IntroTweaks.Patches {
 
         public static Color32 DARK_ORANGE = new(175, 115, 0, 255);
 
+        static GameObject activateCosmetics;
+
         [HarmonyPrefix]
         [HarmonyPatch("Awake")]
         static bool ReplaceVersionText(MenuManager __instance) {
@@ -51,14 +53,22 @@ namespace IntroTweaks.Patches {
                     FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyHostSettings"));
                     FixPanelAlignment(FindInParent(__instance.menuButtons, "LobbyList"));
                     FixPanelAlignment(FindInParent(__instance.menuButtons, "LoadingScreen"));
+
+                    Plugin.Logger.LogDebug("Fixed menu panel alignment.");
                 }
+
                 if (Plugin.Config.IMPROVE_HOST_SCREEN) {
                     // Disable the red background
                     __instance.HostSettingsScreen.transform.Find("Image").gameObject.SetActive(false);
 
+                    // Hide "private lobby" warning.
+
+
                     // Increase size of boxes
 
+
                     // Position boxes to screen center
+
                 }
 
                 GameObject[] buttons = [
@@ -96,8 +106,9 @@ namespace IntroTweaks.Patches {
                     #endregion
 
                     #region Button pos and bring to front.
-                    Transform activate = FindInParent(cosmetics, "ActivateButton").transform;
                     Transform exit = cosmetics.transform.Find("ExitButton").transform;
+                    Transform activate = FindInParent(cosmetics, "ActivateButton").transform;
+                    activateCosmetics = activate.gameObject;
 
                     Vector3 buttonPos = new(424.06f, 241.65f, 166.2f);
                     exit.position = activate.position = buttonPos;
@@ -134,7 +145,7 @@ namespace IntroTweaks.Patches {
             }
 
             if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN) {
-                GameObject lanModeText = __instance.launchedInLanModeText?.transform.gameObject;
+                GameObject lanModeText = __instance.launchedInLanModeText?.gameObject;
                 if (lanModeText) {
                     lanModeText.SetActive(false);
                 }
@@ -148,14 +159,26 @@ namespace IntroTweaks.Patches {
         [HarmonyPostfix]
         [HarmonyPatch("Update")]
         static void UpdatePatch(MenuManager __instance) {
+            bool onMenu = __instance.menuButtons.activeSelf;
+            bool onHostScreen = __instance.HostSettingsScreen.activeSelf;
+            bool cosmeticsOpen = activateCosmetics.transform.parent.gameObject.activeSelf;
+
             // Override version text with game version.
             if (Plugin.Config.CUSTOM_VERSION_TEXT) {
                 versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
 
-                var textObj = versionText.transform.gameObject;
-                if (!textObj.activeSelf && __instance.menuButtons.activeSelf) {
+                var textObj = versionText.gameObject;
+                if (!textObj.activeSelf && onMenu) {
                     textObj.SetActive(true);
                 }
+            }
+
+            if (!activateCosmetics.activeSelf && onMenu && !cosmeticsOpen) {
+                activateCosmetics.SetActive(true);
+            }
+
+            if (!onHostScreen && !onMenu) {
+                activateCosmetics.SetActive(false);
             }
         }
 
@@ -165,7 +188,7 @@ namespace IntroTweaks.Patches {
             __instance.menuButtons.SetActive(false);
 
             if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
-            versionText.transform.gameObject.SetActive(false);
+            versionText.gameObject.SetActive(false);
         }
 
         static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {
@@ -207,8 +230,6 @@ namespace IntroTweaks.Patches {
             RectUtil.EditOffsets(rect, new(-20, -25), new(20, 25));
 
             FixScale(panel);
-
-            Plugin.Logger.LogDebug("Fixed menu panel alignment.");
         }
 
         internal static void FixScale(GameObject obj) {
@@ -225,7 +246,7 @@ namespace IntroTweaks.Patches {
 
             // Move all buttons down slightly.
             foreach (GameObject obj in buttons) {
-                if (obj == creditsButton) continue;
+                if (!obj || obj == creditsButton) continue;
 
                 var pos = obj.transform.position;
                 obj.transform.position = new(pos.x, pos.y - 10f, pos.z);

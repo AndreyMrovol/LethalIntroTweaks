@@ -1,5 +1,7 @@
-## Changelog History
-### v1.4.0
+# Changelog History
+This list is reads from bottom to top, with latest versions first.
+
+## v1.4.0
 **New Features**
 - Skipped **Unity** and **Zeekerss** splash screens! (Configurable)
 - Removed the main menu 'Credits' button. (Configurable)
@@ -14,14 +16,14 @@
 - Fixed issue where version text would stay hidden after exiting from a panel back to the menu.
 - Removed unneeded reference to `InputSystem`.
 
-### v1.3.1
+## v1.3.1
 - Config now has categories.
 - Added 3 new config options to help alleviate mod incompatibilities.
     - `bAlignMenuButtons` - Defaults to **false**.
     - `bFixMenuCanvas` - Defaults to **false**.
     - `bFixMenuPanels` - Defaults to **true**.
 
-### v1.3.0
+## v1.3.0
 **Main Changes**
 - Centered all menu panels so the whitespace at the edges are equal. (OCD havers rejoice)
 - Menu buttons are now aligned with each other and will overflow instead of wrap.
@@ -46,18 +48,18 @@
 - Removing UI elements now sets them to inactive. Destroying them is bad practice.
 - Added try-catch blocks in multiple places to make future debugging easier.
 
-### v1.2.2
+## v1.2.2
 - The ship speaker 'first day' SFX can now be disabled via `bDisableFirstDaySFX`.
 - Added config option `sVersionTextFormat` to display either the full game version or a shortened one.
 - Added config option `fVersionTextSize` to control the font size of the version text.
 - Fixed custom version text not showing - it was accidentally off by default (oops).
 
-### v1.2.1
+## v1.2.1
 - Added config option to toggle the version text. Credit - RectangularObject.
 - BepinExPack now specified as a dependency.
 - New VCR-style icon.
 
-### v1.2.0
+## v1.2.0
 **General**
 - Launch skipping is now more seamless - the greenish "transition" panel has been disabled.
 - Stopped panels overlapping when pressing the 'Host' button. (how other buttons work already)
@@ -72,13 +74,13 @@
 - Setting the anchor position of version text is now done once instead of every frame.
 - Version text now ONLY shows on the main menu. Not settings, credits etc.
 
-### v1.1.0
+## v1.1.0
 - Menu 'OS boot' animation is now skipped. You can revert this via the config.
 - Replaced menu version text - able to be customized.
 - Fixed LAN warning not being removed when AutoSelectHost was false.
 - Changed mod name from 'LC-IntroTweaks' to 'IntroTweaks' in PluginMetadata.
 
-### v1.0.0
+## v1.0.0
 - Skips straight into the selected mode. (Online/LAN)
 - Can automatically press the 'Host' button once in the menu.
 - Removes the LAN warning - no need to hit 'Confirm' every time.

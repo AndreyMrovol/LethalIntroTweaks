@@ -8,12 +8,16 @@ A configurable, quality of life mod for Lethal Company intro/menu screens.
 2. Download `IntroTweaks.dll` and drop it into `Lethal Company\BepInEx\plugins`.
 
 ## Features
-- Skips the Unity and Zeekerss splash screens!
+- Skips the **Unity** and **Zeekerss** splash screens!
 - Seamlessly skips the boot and launch mode screens.
 - Applies various fixes to the menu canvas and its panels.
 - Aligns the main menu buttons with each other.
 - Provides other useful options (startup display, auto select host, remove credits button).
 - Improves look of the version text and moves it to the bottom center.
-- Compatible with LethalExpansion and MoreCompany.
+- Compatible with **LethalExpansion** and **MoreCompany**.
 
 > See the [CHANGELOG](/CHANGELOG.md) file for the full list of changes, additions and fixes.
+
+## Compatibility Notes
+- This mod hides the original version text object, other mods should not be editing it directly - please take that up with them.
+- Unless disabled, IntroTweaks will align the menu buttons. If you have other mods installed that implement their own buttons/logic, please create a new issue with the `Compatibility` tag.

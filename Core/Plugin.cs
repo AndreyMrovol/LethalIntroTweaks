@@ -1,14 +1,17 @@
 using System;
+using System.Threading.Tasks;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using IntroTweaks.Core;
-using UnityEngine.Rendering;
 
-using System.Threading.Tasks;
-using UnityEngine;
 using static UnityEngine.Rendering.SplashScreen;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+
+using IntroTweaks.Core;
+using BepInEx.Bootstrap;
+using System.Linq;
+using IntroTweaks.Patches;
 
 namespace IntroTweaks;
 
@@ -22,6 +25,10 @@ public class Plugin : BaseUnityPlugin {
     private Harmony patcher;
 
     static bool menuLoaded = false;
+
+    public static bool ModInstalled(string name) {
+        return Chainloader.PluginInfos.Keys.Any(p => p.Contains(name));
+    }
 
     private void Awake() {
         Logger = base.Logger;
@@ -61,14 +68,16 @@ public class Plugin : BaseUnityPlugin {
     void SkipSplashScreen() {
         Logger.LogDebug("Skipping splash screens. Ew.");
 
-        do {
-            // Not really a 'real' skip, but good enough for the time being.
+        // Not really a 'real' skip, but good enough for the time being.
+        while (!menuLoaded) {
             SplashScreen.Stop(StopBehavior.StopImmediate);
-        } while (!menuLoaded && Time.realtimeSinceStartup < 8);
+        };
     }
 
-    private void SceneLoaded(Scene scene, LoadSceneMode mode) {
+    private void SceneLoaded(Scene scene, LoadSceneMode _) {
         switch(scene.name) {
+            case "InitScene":
+            case "InitSceneLaunchOptions":
             case "MainMenu": {
                 menuLoaded = true;
                 break;

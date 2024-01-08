@@ -16,7 +16,7 @@ namespace IntroTweaks.Patches {
         [HarmonyPostfix]
         [HarmonyPatch("Start")]
         static void SkipToOnline(PreInitSceneScript __instance, ref bool ___choseLaunchOption) {
-            if (Plugin.SelectedMode.Equals("off")) {
+            if (Plugin.SelectedMode != "online" && Plugin.SelectedMode != "lan") {
                 return;
             }
 
@@ -36,7 +36,7 @@ namespace IntroTweaks.Patches {
             if (IngamePlayerSettings.Instance.encounteredErrorDuringSave)
                 return;
 
-            string sceneToLoad = Plugin.SelectedMode.Equals("online") ? "InitScene" : "InitSceneLANMode";
+            string sceneToLoad = Plugin.SelectedMode == "lan" ? "InitSceneLANMode" : "InitScene";
             SceneManager.LoadScene(sceneToLoad);
             #endregion
         }

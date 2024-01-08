@@ -47,8 +47,6 @@ public class PluginConfig {
     public string VERSION_TEXT { get; private set; }
     public string VERSION_TEXT_FORMAT { get; private set; }
     public float VERSION_TEXT_SIZE { get; private set; }
-    public float VERSION_TEXT_X { get; private set; }
-    public float VERSION_TEXT_Y { get; private set; }
     #endregion
 
     #region Misc
@@ -146,16 +144,6 @@ public class PluginConfig {
 
         VERSION_TEXT_SIZE = NewEntry(Category.VERSION_TEXT, "fVersionTextSize", 20f, 
             "The font size of the version text. Min = 10, Max = 40."
-        );
-
-        VERSION_TEXT_X = NewEntry(Category.VERSION_TEXT, "fVersionTextXPos", 1089.6f,
-            "The position on the horizontal axis where the version text should be placed.\n" +
-            "Positive = Right, Negative = Left"
-        );
-
-        VERSION_TEXT_Y = NewEntry(Category.VERSION_TEXT, "fVersionTextYPos", 554.1f,
-            "The position on the vertical axis where the version text should be placed.\n" +
-            "Positive = Up, Negative = Down"
         );
         #endregion
 

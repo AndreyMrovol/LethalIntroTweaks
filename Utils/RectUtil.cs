@@ -26,15 +26,16 @@ namespace IntroTweaks.Utils {
         }
 
         internal static void AnchorToBottom(RectTransform rect) {
-            EditAnchors(rect, new(0.5f, 0), new(0.5f, 0));
+            ResetSizeDelta(rect);
             ResetAnchoredPos(rect);
 
-            rect.rotation = Quaternion.identity;
-            rect.position = new Vector3(
-                Plugin.Config.VERSION_TEXT_X, 
-                Plugin.Config.VERSION_TEXT_Y,
-                -37
-            );
+            EditAnchors(rect, new(0.5f, 0), new(0.5f, 0));
+            EditOffsets(rect, new(0, 0), new(0, 0));
+
+            //rect.localScale = new(1.05f, 1.05f, 0);
+
+            rect.localRotation = Quaternion.identity;
+            rect.localPosition = new(0, -205, 0);
         }
     }
 }

@@ -4,18 +4,15 @@ using UnityEngine.SceneManagement;
 namespace IntroTweaks.Patches {
     [HarmonyPatch(typeof(PreInitSceneScript))]
     internal class PreSceneInitPatch {
-        [HarmonyPrefix]
-        [HarmonyPatch("SkipToFinalSetting")]
-        static bool DisableTransition(PreInitSceneScript __instance) {
-            bool finishedSetup = IngamePlayerSettings.Instance.settings.playerHasFinishedSetup;
-            if (finishedSetup) __instance.blackTransition.gameObject.SetActive(false);
-
-            return finishedSetup;
+        [HarmonyPostfix]
+        [HarmonyPatch("Start")]
+        static void FinishedFirstLaunch() {
+            IngamePlayerSettings.Instance?.SetPlayerFinishedLaunchOptions();
         }
 
         [HarmonyPostfix]
-        [HarmonyPatch("Start")]
-        static void SkipToOnline(PreInitSceneScript __instance, ref bool ___choseLaunchOption) {
+        [HarmonyPatch("SkipToFinalSetting")]
+        internal static void SkipToSelectedMode(PreInitSceneScript __instance, ref bool ___choseLaunchOption) {
             if (Plugin.SelectedMode != "online" && Plugin.SelectedMode != "lan") {
                 return;
             }
@@ -29,16 +26,12 @@ namespace IntroTweaks.Patches {
 
             ___choseLaunchOption = true;
             __instance.mainAudio.PlayOneShot(__instance.selectSFX);
-
-            IngamePlayerSettings.Instance.SetPlayerFinishedLaunchOptions();
-            IngamePlayerSettings.Instance.SaveChangedSettings();
-
-            if (IngamePlayerSettings.Instance.encounteredErrorDuringSave)
-                return;
-
-            string sceneToLoad = Plugin.SelectedMode == "lan" ? "InitSceneLANMode" : "InitScene";
-            SceneManager.LoadScene(sceneToLoad);
             #endregion
+
+            bool online = Plugin.SelectedMode == "online";
+            string sceneToLoad = online ? "InitScene" : "InitSceneLANMode";
+
+            SceneManager.LoadScene(sceneToLoad);
         }
     }
 }

@@ -1,8 +1,10 @@
 using HarmonyLib;
 using IntroTweaks.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,47 +20,59 @@ internal class MenuManagerPatch {
     public static Color32 DARK_ORANGE = new(175, 115, 0, 255);
 
     static GameObject activateCosmetics;
-    static Transform menuContainer;
 
-    internal static void TryReplaceVersionText(MenuManager instance) {
+    internal static Transform MenuContainer = null;
+    internal static Transform MenuPanel = null;
+    internal static GameObject VersionNum = null;
+
+    static MenuManager Instance;
+
+    internal static void TryReplaceVersionText() {
         if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
+        if (!VersionNum || !MenuPanel) return;
 
-        menuContainer = GameObject.Find("MenuContainer").transform;
-        var buttons = instance.menuButtons?.transform;
+        GameObject clone = Object.Instantiate(VersionNum, MenuPanel);
 
-        GameObject original = instance.versionNumberText?.gameObject;
-        if (original != null) {
-            Plugin.Logger.LogError("version text not found!?");
-            return;
-        }
+        clone.name = "VersionNumberText";
 
-        try {
-            GameObject clone = Object.Instantiate(original, buttons);
+        versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
+        RectUtil.AnchorToBottom(versionText.gameObject.GetComponent<RectTransform>());
 
-            clone.name = "VersionNumberText";
-
-            versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-            RectUtil.AnchorToBottom(versionText.gameObject.GetComponent<RectTransform>());
-
-            original.SetActive(false);
-        } catch (Exception e) {
-            Plugin.Logger.LogError($"Error cloning version text.\n{e}");
-        }
+        VersionNum.SetActive(false);
     }
 
     [HarmonyPostfix]
     [HarmonyPatch("Start")]
-    static void StartPatch(MenuManager __instance) {
-        TryReplaceVersionText(__instance);
+    static void Init(MenuManager __instance) {
+        Instance = __instance;
+        Instance.StartCoroutine(PatchMenuDelayed());
+    }
 
+    private static IEnumerator PatchMenuDelayed() {
+        /* 
+        *  Waits a single frame.
+        *
+        *  This is slightly hacky but ensures all references are not null
+        *  and that the mod makes its changes after all others.
+        */  
+        yield return new WaitForSeconds(0);
+
+        MenuContainer = GameObject.Find("MenuContainer")?.transform;
+        MenuPanel = MenuContainer?.Find("MainButtons");
+        VersionNum = MenuContainer?.Find("VersionNum")?.gameObject;
+
+        PatchMenu();
+    }
+
+    static void PatchMenu() {
         try {
             if (Plugin.Config.FIX_MENU_PANELS) {
                 // Make the white space equal on both sides of the panel.
-                FixPanelAlignment(__instance.menuButtons);
+                FixPanelAlignment(MenuPanel);
 
-                FixPanelAlignment(menuContainer.Find("LobbyHostSettings").gameObject);
-                FixPanelAlignment(menuContainer.Find("LobbyList").gameObject);
-                FixPanelAlignment(menuContainer.Find("LoadingScreen").gameObject);
+                FixPanelAlignment(MenuContainer.Find("LobbyHostSettings"));
+                FixPanelAlignment(MenuContainer.Find("LobbyList"));
+                FixPanelAlignment(MenuContainer.Find("LoadingScreen"));
 
                 Plugin.Logger.LogDebug("Fixed menu panel alignment.");
             }
@@ -87,16 +101,16 @@ internal class MenuManagerPatch {
             }
 
             //GameObject[] buttons = [
-            //    __instance.joinCrewButtonContainer,
-            //    __instance.lanButtonContainer,
-            //    GetButton(__instance.menuButtons, "HostButton"),
-            //    GetButton(__instance.menuButtons, "SettingsButton"),
-            //    GetButton(__instance.menuButtons, "Credits"),
-            //    GetButton(__instance.menuButtons, "QuitButton"),
-            //    GetButton(__instance.menuButtons, "ModSettingsButton")
+            //    Instance.joinCrewButtonContainer,
+            //    Instance.lanButtonContainer,
+            //    GetButton(MenuButtons, "HostButton"),
+            //    GetButton(MenuButtons, "SettingsButton"),
+            //    GetButton(MenuButtons, "Credits"),
+            //    GetButton(MenuButtons, "QuitButton"),
+            //    GetButton(MenuButtons, "ModSettingsButton")
             //];
 
-            IEnumerable<GameObject> buttons = menuContainer.Find("MainButtons")
+            IEnumerable<GameObject> buttons = MenuPanel
                 .GetComponentsInChildren<Button>(true)
                 .Select(b => b.gameObject);
 
@@ -112,6 +126,8 @@ internal class MenuManagerPatch {
 
             #region Handle MoreCompany edits if found.
             if (Plugin.ModInstalled("MoreCompany")) {
+                Plugin.Logger.LogDebug("MoreCompany found! Edits have been made to UI elements.");
+
                 fixCanvas = false;
 
                 GameObject mc = GameObject.Find("GlobalScale");
@@ -140,7 +156,7 @@ internal class MenuManagerPatch {
                 #endregion
 
                 #region Header scale & position.
-                Transform header = __instance.menuButtons.transform.Find("HeaderImage").transform;
+                Transform header = Instance.menuButtons.transform.Find("HeaderImage").transform;
                 header.localScale = new Vector3(5, 5, 5);
 
                 Vector3 headerPos = new(1093.05f, 647.79f, -35.33f);
@@ -149,29 +165,29 @@ internal class MenuManagerPatch {
             }
             #endregion
 
-            TweakCanvasSettings(__instance.menuButtons, fixCanvas);
+            //TweakCanvasSettings(Instance.menuButtons, fixCanvas);
         }
         catch (Exception e) {
             Plugin.Logger.LogError($"Error occurred in Start patch. SAJ.\n{e}");
         }
             
         if (Plugin.Config.REMOVE_NEWS_PANEL) {
-            __instance.NewsPanel.SetActive(false);
+            Instance.NewsPanel.SetActive(false);
         }
 
         if (Plugin.Config.REMOVE_LAN_WARNING) {
-            __instance.lanWarningContainer.SetActive(false);
+            Instance.lanWarningContainer.SetActive(false);
         }
 
         if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN) {
-            GameObject lanModeText = __instance.launchedInLanModeText?.gameObject;
+            GameObject lanModeText = Instance.launchedInLanModeText?.gameObject;
             if (lanModeText) {
                 lanModeText.SetActive(false);
             }
         }
 
         if (Plugin.Config.AUTO_SELECT_HOST) {
-            __instance.ClickHostButton();
+            Instance.ClickHostButton();
         }
     }
 
@@ -180,8 +196,10 @@ internal class MenuManagerPatch {
     static void UpdatePatch(MenuManager __instance) {
         bool onMenu = __instance.menuButtons.activeSelf;
 
-        // Override version text with game version.
-        if (versionText) {
+        // Create the new game version text.
+        if (versionText == null) TryReplaceVersionText();
+        else {
+            // Make sure the text is correct.
             versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
 
             var textObj = versionText.gameObject;
@@ -244,14 +262,14 @@ internal class MenuManagerPatch {
         }
     }
 
-    static void FixPanelAlignment(GameObject panel) {
-        var rect = panel.GetComponent<RectTransform>();
+    static void FixPanelAlignment(Transform panel) {
+        var rect = panel.gameObject.GetComponent<RectTransform>();
 
         RectUtil.ResetSizeDelta(rect);
         RectUtil.ResetAnchoredPos(rect);
         RectUtil.EditOffsets(rect, new(-20, -25), new(20, 25));
 
-        FixScale(panel);
+        FixScale(panel.gameObject);
     }
 
     internal static void FixScale(GameObject obj) {
@@ -264,14 +282,14 @@ internal class MenuManagerPatch {
 
         // Disable credits button and move quit button there instead.
         creditsButton.SetActive(false);
-        quitButton.transform.position = creditsButton.transform.position;
+        quitButton.transform.localPosition = creditsButton.transform.localPosition;
 
         // Move all buttons down slightly.
         foreach (GameObject obj in buttons) {
             if (!obj || obj == creditsButton) continue;
 
-            var pos = obj.transform.position;
-            obj.transform.position = new(pos.x, pos.y - 10f, pos.z);
+            var pos = obj.transform.localPosition;
+            obj.transform.localPosition = new(pos.x, pos.y - 45, pos.z);
         }
 
         Plugin.Logger.LogDebug("Removed credits button.");
@@ -313,9 +331,9 @@ internal class MenuManagerPatch {
         Plugin.Logger.LogDebug("Aligned menu buttons.");
     }
 
-    static GameObject GetButton(GameObject panel, string name) {
+    static GameObject GetButton(Transform panel, string name) {
         try {
-            return panel.transform.Find(name).gameObject;
+            return panel.Find(name).gameObject;
         } catch(Exception e) { 
             if (name != "ModSettingsButton")
                 Plugin.Logger.LogError($"Error getting button: {name}\n{e}");

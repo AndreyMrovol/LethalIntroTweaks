@@ -26,9 +26,10 @@ public class Plugin : BaseUnityPlugin {
 
     static bool menuLoaded = false;
 
-    public static bool ModInstalled(string name) {
-        return Chainloader.PluginInfos.Keys.Any(p => p.Contains(name));
-    }
+    public static bool ModInstalled(string name) => Chainloader.PluginInfos.Values.Any(p => 
+        p.Metadata.GUID.ToLower().Contains(name) || 
+        p.Metadata.Name.ToLower() == name.ToLower()
+    );
 
     private void Awake() {
         Logger = base.Logger;

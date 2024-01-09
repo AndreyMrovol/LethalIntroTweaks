@@ -1,6 +1,14 @@
 # Changelog History
 This list is reads from bottom to top, with latest versions first.
 
+## v1.4.1
+- Support v47 by fixing the settings issue. See [this issue](https://github.com/Owen3H/IntroTweaks/issues/6).
+- Improved compatibility with future **MoreCompany** versions by detecting it's loaded rather than finding it's canvas.
+- Removed `CUSTOM_VERSION_TEXT_X` and `CUSTOM_VERSION_TEXT_Y`. It was annoying to use and cluttered the config.
+- Button alignment should now play nicely with mods without explicit support.
+- Fixed splash screens not being skipped when mod loading takes >10s.
+- Fixed all the null reference errors. (yay)
+
 ## v1.4.0
 **New Features**
 - Skipped **Unity** and **Zeekerss** splash screens! (Configurable)

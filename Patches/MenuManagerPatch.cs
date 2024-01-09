@@ -77,39 +77,6 @@ internal class MenuManagerPatch {
                 Plugin.Logger.LogDebug("Fixed menu panel alignment.");
             }
 
-            if (Plugin.Config.IMPROVE_HOST_SCREEN) {
-                // Hide the red background & private/public tip text
-                //__instance.HostSettingsScreen.transform.Find("Image").gameObject.SetActive(false);
-                //GameObject.Find("PrivatePublicDescription").SetActive(false);
-
-                /*
-                // Increase size of boxes
-                var hostBox = __instance.HostSettingsOptionsLAN.transform.parent.parent;
-                var filesBox = FindInParent(hostBox.gameObject, "FilesPanel").transform;
-
-                //hostBox.localScale = new(1.2f, 1.2f, 1.2f);
-                //filesBox.localScale = new(1.1f, 1.1f, 1.1f);
-
-                RectUtil.EditOffsets(hostBox.GetComponent<RectTransform>(), new(80, 100), new(-180, -105));
-                hostBox.localPosition = new(hostBox.localPosition.x - 60, 0, hostBox.localPosition.z);
-
-                filesBox.localPosition = new(filesBox.localPosition.x - 80, 0, filesBox.localPosition.z);
-
-                // Position boxes to screen center
-                */
-
-            }
-
-            //GameObject[] buttons = [
-            //    Instance.joinCrewButtonContainer,
-            //    Instance.lanButtonContainer,
-            //    GetButton(MenuButtons, "HostButton"),
-            //    GetButton(MenuButtons, "SettingsButton"),
-            //    GetButton(MenuButtons, "Credits"),
-            //    GetButton(MenuButtons, "QuitButton"),
-            //    GetButton(MenuButtons, "ModSettingsButton")
-            //];
-
             IEnumerable<GameObject> buttons = MenuPanel
                 .GetComponentsInChildren<Button>(true)
                 .Select(b => b.gameObject);
@@ -165,7 +132,7 @@ internal class MenuManagerPatch {
             }
             #endregion
 
-            //TweakCanvasSettings(Instance.menuButtons, fixCanvas);
+            TweakCanvasSettings(Instance.menuButtons, fixCanvas);
         }
         catch (Exception e) {
             Plugin.Logger.LogError($"Error occurred in Start patch. SAJ.\n{e}");
@@ -208,18 +175,18 @@ internal class MenuManagerPatch {
             }
         }
 
-        if (activateCosmetics != null) {
-            bool onHostScreen = __instance.HostSettingsScreen.activeSelf;
-            bool cosmeticsOpen = activateCosmetics.transform.parent.gameObject.activeSelf;
+        //if (activateCosmetics != null) {
+        //    bool onHostScreen = __instance.HostSettingsScreen.activeSelf;
+        //    bool cosmeticsOpen = activateCosmetics.transform.parent.gameObject.activeSelf;
 
-            if (!activateCosmetics.activeSelf && onMenu && !cosmeticsOpen) {
-                activateCosmetics.SetActive(true);
-            }
+        //    if (!activateCosmetics.activeSelf && onMenu && !cosmeticsOpen) {
+        //        activateCosmetics.SetActive(true);
+        //    }
 
-            if (!onHostScreen && !onMenu) {
-                activateCosmetics.SetActive(false);
-            }
-        }
+        //    if (!onHostScreen && !onMenu) {
+        //        activateCosmetics.SetActive(false);
+        //    }
+        //}
     }
 
     [HarmonyPrefix]

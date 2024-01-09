@@ -11,7 +11,6 @@ using UnityEngine.SceneManagement;
 using IntroTweaks.Core;
 using BepInEx.Bootstrap;
 using System.Linq;
-using IntroTweaks.Patches;
 
 namespace IntroTweaks;
 

@@ -34,7 +34,7 @@ public class PluginConfig {
     public bool ALIGN_MENU_BUTTONS { get; private set; }
     public bool FIX_MENU_CANVAS { get; private set; }
     public bool FIX_MENU_PANELS { get; private set; }
-    public bool IMPROVE_HOST_SCREEN { get; private set; }
+    //public bool IMPROVE_HOST_SCREEN { get; private set; }
 
     public bool REMOVE_LAN_WARNING { get; private set; }
     public bool REMOVE_LAUNCHED_IN_LAN { get; private set; }
@@ -106,9 +106,9 @@ public class PluginConfig {
             "This option helps solve them and improve the look of the menu.\n\nMAY BREAK SOME MODS."
         );
 
-        IMPROVE_HOST_SCREEN = NewEntry(Category.MENU_TWEAKS, "bImproveHostScreen", true,
-            "Should improvements be made to the host screen?"
-        );
+        //IMPROVE_HOST_SCREEN = NewEntry(Category.MENU_TWEAKS, "bImproveHostScreen", true,
+        //    "Should improvements be made to the host screen?"
+        //);
 
         REMOVE_LAN_WARNING = NewEntry(Category.MENU_TWEAKS, "bRemoveLanWarning", true, 
             "Hides the warning popup when hosting a LAN session."

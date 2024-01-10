@@ -137,7 +137,7 @@ public class PluginConfig {
             "To insert the version number, use the $VERSION syntax. E.g. Ver69 would be Ver$VERSION"
         );
 
-        VERSION_TEXT_FORMAT = NewEntry(Category.VERSION_TEXT, "sVersionTextFormat", "FULL",
+        VERSION_TEXT_FORMAT = NewEntry(Category.VERSION_TEXT, "sVersionTextFormat", "SHORT",
             "Determines how to display game version number.\n" +
             "Valid options: FULL, SHORT"
         );

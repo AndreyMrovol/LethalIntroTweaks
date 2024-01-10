@@ -37,5 +37,9 @@ namespace IntroTweaks.Utils {
             rect.localRotation = Quaternion.identity;
             rect.localPosition = new(0, -205, 0);
         }
+
+        internal static bool IsAbove(Transform cur, Transform target) {
+            return cur.localPosition.y > target.localPosition.y;
+        }
     }
 }

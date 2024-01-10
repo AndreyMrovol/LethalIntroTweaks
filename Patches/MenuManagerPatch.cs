@@ -23,15 +23,11 @@ internal class MenuManagerPatch {
     internal static Transform MenuContainer = null;
     internal static Transform MenuPanel = null;
 
-    static bool MenuPatched;
-
     static MenuManager Instance;
 
     [HarmonyPostfix]
     [HarmonyPatch("Start")]
     static void Init(MenuManager __instance) {
-        if (MenuPatched) return;
-
         Instance = __instance;
         Instance.StartCoroutine(PatchMenuDelayed());
     }
@@ -113,8 +109,8 @@ internal class MenuManagerPatch {
 
                 #region Header scale & position.
                 Transform header = Instance.menuButtons.transform.Find("HeaderImage").transform;
-                header.localScale = new(5, 5, 5);
-                header.localPosition = new(header.localPosition.x, header.localPosition.y + 5, 0);
+                header.localScale = new(4.9f, 4.9f, 4.9f);
+                header.localPosition = new(header.localPosition.x, header.localPosition.y + 35, 0);
                 #endregion
             }
             #endregion
@@ -145,8 +141,6 @@ internal class MenuManagerPatch {
         if (Plugin.Config.AUTO_SELECT_HOST) {
             Instance.ClickHostButton();
         }
-
-        MenuPatched = true;
     }
 
     [HarmonyPostfix]
@@ -188,20 +182,17 @@ internal class MenuManagerPatch {
         var creditsHeight = creditsRect.rect.height * 1.3f;
 
         buttons.Do(obj => {
-            if (!obj) return;
+            if (!obj || obj == creditsButton) return;
+
             var cur = obj.transform;
             var pos = cur.localPosition;
 
-            if (IsAbove(obj.transform, creditsRect)) {
+            if (RectUtil.IsAbove(obj.transform, creditsRect)) {
                 cur.localPosition = new(pos.x, pos.y - creditsHeight, pos.z);
             }
         });
 
         Plugin.Logger.LogDebug("Removed credits button.");
-    }
-
-    static bool IsAbove(Transform obj, Transform rect) {
-        return obj.localPosition.y > rect.localPosition.y;
     }
 
     static void AlignButtons(IEnumerable<GameObject> buttons) {

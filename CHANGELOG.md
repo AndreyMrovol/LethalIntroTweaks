@@ -1,6 +1,14 @@
 # Changelog History
 This list is reads from bottom to top, with latest versions first.
 
+## v1.4.2
+- Fixed header/logo disappearing when navigating menus.
+- Fixed the **LethalConfig** button being below the Quit button.
+- Button alignment behaves better with other mod buttons, as well as when `bRemoveCreditsButton` is true.
+- Some silly mod devs patch `PlayFirstDayShipAnimation` to implement their code, IT will no longer exit this early. 
+  - The speaker SFX is now stopped at the end of the `firstDayAnimation` enumerator instead.
+- Removed some dead/commented code and unused ref being set.
+
 ## v1.4.1
 - Support v47 by fixing the settings issue. See [this issue](https://github.com/Owen3H/IntroTweaks/issues/6).
 - Improved compatibility with future **MoreCompany** versions by detecting it's loaded rather than finding it's canvas.

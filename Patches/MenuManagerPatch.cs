@@ -19,31 +19,19 @@ internal class MenuManagerPatch {
 
     public static Color32 DARK_ORANGE = new(175, 115, 0, 255);
 
-    static GameObject activateCosmetics;
-
+    internal static GameObject VersionNum = null;
     internal static Transform MenuContainer = null;
     internal static Transform MenuPanel = null;
-    internal static GameObject VersionNum = null;
+
+    static bool MenuPatched;
 
     static MenuManager Instance;
-
-    internal static void TryReplaceVersionText() {
-        if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
-        if (!VersionNum || !MenuPanel) return;
-
-        GameObject clone = Object.Instantiate(VersionNum, MenuPanel);
-
-        clone.name = "VersionNumberText";
-
-        versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-        RectUtil.AnchorToBottom(versionText.gameObject.GetComponent<RectTransform>());
-
-        VersionNum.SetActive(false);
-    }
 
     [HarmonyPostfix]
     [HarmonyPatch("Start")]
     static void Init(MenuManager __instance) {
+        if (MenuPatched) return;
+
         Instance = __instance;
         Instance.StartCoroutine(PatchMenuDelayed());
     }
@@ -77,6 +65,7 @@ internal class MenuManagerPatch {
                 Plugin.Logger.LogDebug("Fixed menu panel alignment.");
             }
 
+            #region Remove credits buttons and align others.
             IEnumerable<GameObject> buttons = MenuPanel
                 .GetComponentsInChildren<Button>(true)
                 .Select(b => b.gameObject);
@@ -88,6 +77,7 @@ internal class MenuManagerPatch {
             if (Plugin.Config.REMOVE_CREDITS_BUTTON) {
                 RemoveCreditsButton(buttons);
             }
+            #endregion
 
             bool fixCanvas = Plugin.Config.FIX_MENU_CANVAS;
 
@@ -110,7 +100,6 @@ internal class MenuManagerPatch {
                 #region Button pos and bring to front.
                 Transform exit = cosmetics.transform.Find("ExitButton").transform;
                 Transform activate = FindInParent(cosmetics, "ActivateButton").transform;
-                activateCosmetics = activate.gameObject;
 
                 Vector3 buttonPos = new(424.06f, 241.65f, 166.2f);
                 exit.position = activate.position = buttonPos;
@@ -124,10 +113,8 @@ internal class MenuManagerPatch {
 
                 #region Header scale & position.
                 Transform header = Instance.menuButtons.transform.Find("HeaderImage").transform;
-                header.localScale = new Vector3(5, 5, 5);
-
-                Vector3 headerPos = new(1093.05f, 647.79f, -35.33f);
-                header.position = headerPos;
+                header.localScale = new(5, 5, 5);
+                header.localPosition = new(header.localPosition.x, header.localPosition.y + 5, 0);
                 #endregion
             }
             #endregion
@@ -135,9 +122,10 @@ internal class MenuManagerPatch {
             TweakCanvasSettings(Instance.menuButtons, fixCanvas);
         }
         catch (Exception e) {
-            Plugin.Logger.LogError($"Error occurred in Start patch. SAJ.\n{e}");
+            Plugin.Logger.LogError($"An error occurred patching the menu. SAJ.\n{e}");
         }
-            
+
+        #region Hide UI elements
         if (Plugin.Config.REMOVE_NEWS_PANEL) {
             Instance.NewsPanel.SetActive(false);
         }
@@ -152,10 +140,13 @@ internal class MenuManagerPatch {
                 lanModeText.SetActive(false);
             }
         }
+        #endregion
 
         if (Plugin.Config.AUTO_SELECT_HOST) {
             Instance.ClickHostButton();
         }
+
+        MenuPatched = true;
     }
 
     [HarmonyPostfix]
@@ -163,7 +154,7 @@ internal class MenuManagerPatch {
     static void UpdatePatch(MenuManager __instance) {
         bool onMenu = __instance.menuButtons.activeSelf;
 
-        // Create the new game version text.
+        // Create the new game version text if not made already.
         if (versionText == null) TryReplaceVersionText();
         else {
             // Make sure the text is correct.
@@ -174,19 +165,6 @@ internal class MenuManagerPatch {
                 textObj.SetActive(true);
             }
         }
-
-        //if (activateCosmetics != null) {
-        //    bool onHostScreen = __instance.HostSettingsScreen.activeSelf;
-        //    bool cosmeticsOpen = activateCosmetics.transform.parent.gameObject.activeSelf;
-
-        //    if (!activateCosmetics.activeSelf && onMenu && !cosmeticsOpen) {
-        //        activateCosmetics.SetActive(true);
-        //    }
-
-        //    if (!onHostScreen && !onMenu) {
-        //        activateCosmetics.SetActive(false);
-        //    }
-        //}
     }
 
     [HarmonyPrefix]
@@ -196,6 +174,80 @@ internal class MenuManagerPatch {
 
         if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
         versionText.gameObject.SetActive(false);
+    }
+
+    static void RemoveCreditsButton(IEnumerable<GameObject> buttons) {
+        GameObject quitButton = buttons.First(b => b.name == "QuitButton");
+        GameObject creditsButton = buttons.First(b => b.name == "Credits");
+
+        // Disable credits button and move quit button there instead.
+        creditsButton.SetActive(false);
+
+        // Move all buttons before the credits button down.
+        var creditsRect = creditsButton.GetComponent<RectTransform>();
+        var creditsHeight = creditsRect.rect.height * 1.3f;
+
+        buttons.Do(obj => {
+            if (!obj) return;
+            var cur = obj.transform;
+            var pos = cur.localPosition;
+
+            if (IsAbove(obj.transform, creditsRect)) {
+                cur.localPosition = new(pos.x, pos.y - creditsHeight, pos.z);
+            }
+        });
+
+        Plugin.Logger.LogDebug("Removed credits button.");
+    }
+
+    static bool IsAbove(Transform obj, Transform rect) {
+        return obj.localPosition.y > rect.localPosition.y;
+    }
+
+    static void AlignButtons(IEnumerable<GameObject> buttons) {
+        Vector3 hostButtonPos = buttons.First(b => b.name == "HostButton")
+            .GetComponent<RectTransform>().localPosition;
+
+        foreach (GameObject obj in buttons) {
+            if (!obj) continue;
+
+            #region Move right slightly.
+            RectTransform rect = obj.GetComponent<RectTransform>();
+            rect.localPosition = new(hostButtonPos.x + 15, rect.localPosition.y, hostButtonPos.z);
+            #endregion
+
+            #region Fix text mesh settings
+            TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
+
+            FixScale(text.gameObject);
+            TweakTextSettings(text);
+
+            text.fontSize = 15;
+            text.wordSpacing -= 25;
+            #endregion
+
+            #region Fix button text rect
+            var textRect = text.gameObject.GetComponent<RectTransform>();
+            RectUtil.ResetAnchoredPos(textRect);
+            RectUtil.ResetSizeDelta(textRect);
+            RectUtil.EditOffsets(textRect, Vector2.zero, new(5, 0));
+            #endregion
+        }
+
+        Plugin.Logger.LogDebug("Aligned menu buttons.");
+    }
+
+    internal static void TryReplaceVersionText() {
+        if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
+        if (VersionNum == null || MenuPanel == null) return;
+
+        GameObject clone = Object.Instantiate(VersionNum, MenuPanel);
+        clone.name = "VersionNumberText";
+
+        versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
+        RectUtil.AnchorToBottom(versionText.gameObject.GetComponent<RectTransform>());
+
+        VersionNum.SetActive(false);
     }
 
     static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {
@@ -243,68 +295,11 @@ internal class MenuManagerPatch {
         obj.transform.localScale = new(1.02f, 1.06f, 1.02f);
     }
 
-    static void RemoveCreditsButton(IEnumerable<GameObject> buttons) {
-        GameObject quitButton = buttons.First(b => b.name == "QuitButton");
-        GameObject creditsButton = buttons.First(b => b.name == "Credits");
-
-        // Disable credits button and move quit button there instead.
-        creditsButton.SetActive(false);
-        quitButton.transform.localPosition = creditsButton.transform.localPosition;
-
-        // Move all buttons down slightly.
-        foreach (GameObject obj in buttons) {
-            if (!obj || obj == creditsButton) continue;
-
-            var pos = obj.transform.localPosition;
-            obj.transform.localPosition = new(pos.x, pos.y - 45, pos.z);
-        }
-
-        Plugin.Logger.LogDebug("Removed credits button.");
-    }
-
-    static void AlignButtons(IEnumerable<GameObject> buttons) {
-        var hostButtonPos = buttons.First(b => b.name == "HostButton")
-            .GetComponent<RectTransform>().localPosition;
-
-        foreach (GameObject obj in buttons) {
-            if (!obj) continue;
-
-            #region Fix button rect
-            RectTransform rect = obj.GetComponent<RectTransform>();
-
-            int yOffset = Plugin.Config.REMOVE_CREDITS_BUTTON ? 20 : -5;
-            rect.localPosition = new(hostButtonPos.x + 20, rect.localPosition.y + yOffset, hostButtonPos.z);
-            #endregion
-
-            #region Fix text mesh settings
-            TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
-
-            FixScale(text.gameObject);
-            TweakTextSettings(text);
-
-            text.fontSize = 15;
-            text.wordSpacing -= 25;
-            //text.fontStyle = FontStyles.UpperCase;
-            #endregion
-
-            #region Fix button text rect
-            var textRect = text.gameObject.GetComponent<RectTransform>();
-            RectUtil.ResetAnchoredPos(textRect);
-            RectUtil.ResetSizeDelta(textRect);
-            RectUtil.EditOffsets(textRect, Vector2.zero, new(5, 0));
-            #endregion
-        }
-
-        Plugin.Logger.LogDebug("Aligned menu buttons.");
-    }
-
     static GameObject GetButton(Transform panel, string name) {
         try {
             return panel.Find(name).gameObject;
         } catch(Exception e) { 
-            if (name != "ModSettingsButton")
-                Plugin.Logger.LogError($"Error getting button: {name}\n{e}");
-
+            Plugin.Logger.LogError($"Error getting button: {name}\n{e}");
             return null;
         }
     }

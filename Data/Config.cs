@@ -1,22 +1,8 @@
 using BepInEx.Configuration;
 
-namespace IntroTweaks.Core;
+namespace IntroTweaks.Data;
 
-public struct Category {
-    public static Category GENERAL => new("0 >> General << 0");
-    public static Category INTRO_TWEAKS => new("1 >> Intro << 1");
-    public static Category MENU_TWEAKS => new("2 >> Main Menu << 2");
-    public static Category VERSION_TEXT => new("3 >> Custom Version Text << 3");
-    public static Category MISC => new("4 >> Miscellaneous << 4");
-
-    public string Value { get; private set; }
-
-    private Category(string value) {
-        Value = value;
-    }
-}
-
-public class PluginConfig {
+public class Config {
     #region Properties
     #region General
     public bool PLUGIN_ENABLED { get; private set; }
@@ -57,7 +43,7 @@ public class PluginConfig {
     readonly ConfigFile configFile;
     #endregion
 
-    public PluginConfig(ConfigFile cfg) {
+    public Config(ConfigFile cfg) {
         configFile = cfg;
 
         PLUGIN_ENABLED = NewEntry("bEnabled", true, "Enable or disable the plugin globally.");
@@ -67,13 +53,11 @@ public class PluginConfig {
         );
     }
 
-    private T NewEntry<T>(string key, T defaultVal, string desc) {
-        return NewEntry(Category.GENERAL, key, defaultVal, desc);
-    }
+    private T NewEntry<T>(string key, T defaultVal, string desc) =>
+        NewEntry(Category.GENERAL, key, defaultVal, desc);
 
-    private T NewEntry<T>(Category category, string key, T defaultVal, string desc) {
-        return configFile.Bind(category.Value, key, defaultVal, desc).Value;
-    }
+    private T NewEntry<T>(Category category, string key, T defaultVal, string desc) =>
+        configFile.Bind(category.Value, key, defaultVal, desc).Value;
 
     public void InitBindings() {
         #region Options related to the intro.
@@ -92,16 +76,16 @@ public class PluginConfig {
         #endregion
 
         #region Tweaks to the main menu
-        ALIGN_MENU_BUTTONS = NewEntry(Category.MENU_TWEAKS, "bAlignMenuButtons", true, 
+        ALIGN_MENU_BUTTONS = NewEntry(Category.MENU_TWEAKS, "bAlignMenuButtons", true,
             "If the main menu buttons should align with each other."
         );
 
-        FIX_MENU_CANVAS = NewEntry(Category.MENU_TWEAKS, "bFixMenuCanvas", true, 
-            "Whether the main menu canvas should have its settings corrected.\n" + 
+        FIX_MENU_CANVAS = NewEntry(Category.MENU_TWEAKS, "bFixMenuCanvas", true,
+            "Whether the main menu canvas should have its settings corrected.\n" +
             "May cause overlapping issues, only turn it on if you aren't using other menu mods."
         );
 
-        FIX_MENU_PANELS = NewEntry(Category.MENU_TWEAKS, "bFixMenuPanels", true, 
+        FIX_MENU_PANELS = NewEntry(Category.MENU_TWEAKS, "bFixMenuPanels", true,
             "The main menu panels (host, servers, loading screen) all have anchoring, offset and sizing issues.\n" +
             "This option helps solve them and improve the look of the menu.\n\nMAY BREAK SOME MODS."
         );
@@ -110,19 +94,19 @@ public class PluginConfig {
         //    "Should improvements be made to the host screen?"
         //);
 
-        REMOVE_LAN_WARNING = NewEntry(Category.MENU_TWEAKS, "bRemoveLanWarning", true, 
+        REMOVE_LAN_WARNING = NewEntry(Category.MENU_TWEAKS, "bRemoveLanWarning", true,
             "Hides the warning popup when hosting a LAN session."
         );
 
-        REMOVE_LAUNCHED_IN_LAN = NewEntry(Category.MENU_TWEAKS, "bRemoveLaunchedInLanText", true, 
+        REMOVE_LAUNCHED_IN_LAN = NewEntry(Category.MENU_TWEAKS, "bRemoveLaunchedInLanText", true,
             "Hides the 'Launched in LAN mode' text below the Quit button."
         );
 
-        REMOVE_NEWS_PANEL = NewEntry(Category.MENU_TWEAKS, "bRemoveNewsPanel", false, 
+        REMOVE_NEWS_PANEL = NewEntry(Category.MENU_TWEAKS, "bRemoveNewsPanel", false,
             "Hides the panel that displays news such as game updates."
         );
 
-        REMOVE_CREDITS_BUTTON = NewEntry(Category.MENU_TWEAKS, "bRemoveCreditsButton", true, 
+        REMOVE_CREDITS_BUTTON = NewEntry(Category.MENU_TWEAKS, "bRemoveCreditsButton", true,
             "Hides the 'Credits' button on the main menu. The other buttons are automatically adjusted."
         );
         #endregion
@@ -132,7 +116,7 @@ public class PluginConfig {
             "Whether to replace the game's version text with a custom alternative."
         );
 
-        VERSION_TEXT = NewEntry(Category.VERSION_TEXT, "sVersionText", "v$VERSION\n[MODDED]", 
+        VERSION_TEXT = NewEntry(Category.VERSION_TEXT, "sVersionText", "v$VERSION\n[MODDED]",
             "Replace the game's version text with this custom text in the main menu.\n" +
             "To insert the version number, use the $VERSION syntax. E.g. Ver69 would be Ver$VERSION"
         );
@@ -142,17 +126,17 @@ public class PluginConfig {
             "Valid options: FULL, SHORT"
         );
 
-        VERSION_TEXT_SIZE = NewEntry(Category.VERSION_TEXT, "fVersionTextSize", 20f, 
+        VERSION_TEXT_SIZE = NewEntry(Category.VERSION_TEXT, "fVersionTextSize", 20f,
             "The font size of the version text. Min = 10, Max = 40."
         );
         #endregion
 
         #region Misc options
-        DISABLE_FIRST_DAY_SFX = NewEntry(Category.MISC, "bDisableFirstDaySFX", false, 
+        DISABLE_FIRST_DAY_SFX = NewEntry(Category.MISC, "bDisableFirstDaySFX", false,
             "Toggles the first day ship speaker SFX."
         );
 
-        GAME_STARTUP_DISPLAY = NewEntry(Category.MISC, "iGameStartupDisplay", 0, 
+        GAME_STARTUP_DISPLAY = NewEntry(Category.MISC, "iGameStartupDisplay", 0,
             "The index of the monitor to display the game on when starting.\n" +
             "You can find these indexes in your Windows display settings.\n" +
             "Defaults to 0 (main monitor)."

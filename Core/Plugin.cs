@@ -11,13 +11,14 @@ using UnityEngine.SceneManagement;
 using IntroTweaks.Core;
 using BepInEx.Bootstrap;
 using System.Linq;
+using IntroTweaks.Data;
 
 namespace IntroTweaks;
 
 [BepInPlugin(Metadata.GUID, Metadata.NAME, Metadata.VERSION)]
 public class Plugin : BaseUnityPlugin {
     internal static new ManualLogSource Logger { get; private set; }
-    public static new PluginConfig Config { get; private set; }
+    public static new Config Config { get; private set; }
 
     internal static string SelectedMode;
 
@@ -25,10 +26,15 @@ public class Plugin : BaseUnityPlugin {
 
     static bool menuLoaded = false;
 
-    public static bool ModInstalled(string name) => Chainloader.PluginInfos.Values.Any(p => 
-        p.Metadata.GUID.ToLower().Contains(name) || 
-        p.Metadata.Name.ToLower() == name.ToLower()
-    );
+    // May want to use 'Keys' for this in future.
+    public static bool ModInstalled(string name) {
+        name = name.ToLower();
+
+        return Chainloader.PluginInfos.Values.Any(p => 
+            p.Metadata.GUID.ToLower().Contains(name) || 
+            p.Metadata.Name.ToLower() == name
+        );
+    }
 
     private void Awake() {
         Logger = base.Logger;

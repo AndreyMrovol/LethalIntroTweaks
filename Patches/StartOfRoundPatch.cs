@@ -2,26 +2,26 @@ using HarmonyLib;
 using System.Collections;
 using UnityEngine;
 
-namespace IntroTweaks.Patches {
-    [HarmonyPatch(typeof(StartOfRound))]
-    internal class StartOfRoundPatch {
-        [HarmonyPostfix]
-        [HarmonyPatch("firstDayAnimation")]
-        static IEnumerator DisableFirstDaySFX(IEnumerator result, StartOfRound __instance) {
-            // Run original.
-            while (result.MoveNext()) {
-                yield return result.Current;
-            }
+namespace IntroTweaks.Patches;
 
-            if (Plugin.Config.DISABLE_FIRST_DAY_SFX) {
-                StopSpeaker(__instance.speakerAudioSource);
-            }
+[HarmonyPatch(typeof(StartOfRound))]
+internal class StartOfRoundPatch {
+    [HarmonyPostfix]
+    [HarmonyPatch("firstDayAnimation")]
+    static IEnumerator DisableFirstDaySFX(IEnumerator result, StartOfRound __instance) {
+        // Run original.
+        while (result.MoveNext()) {
+            yield return result.Current;
         }
 
-        static void StopSpeaker(AudioSource source) {
-            if (source.isPlaying) {
-                source.Stop();
-            }
+        if (Plugin.Config.DISABLE_FIRST_DAY_SFX) {
+            StopSpeaker(__instance.speakerAudioSource);
+        }
+    }
+
+    static void StopSpeaker(AudioSource source) {
+        if (source.isPlaying) {
+            source.Stop();
         }
     }
 }

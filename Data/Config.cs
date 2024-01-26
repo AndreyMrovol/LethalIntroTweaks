@@ -31,8 +31,8 @@ public class Config {
     #region Version Text
     public bool CUSTOM_VERSION_TEXT { get; private set; }
     public string VERSION_TEXT { get; private set; }
-    public string VERSION_TEXT_FORMAT { get; private set; }
     public float VERSION_TEXT_SIZE { get; private set; }
+    public bool ALWAYS_SHORT_VERSION { get; private set; }
     #endregion
 
     #region Misc
@@ -121,13 +121,13 @@ public class Config {
             "To insert the version number, use the $VERSION syntax. E.g. Ver69 would be Ver$VERSION"
         );
 
-        VERSION_TEXT_FORMAT = NewEntry(Category.VERSION_TEXT, "sVersionTextFormat", "SHORT",
-            "Determines how to display game version number.\n" +
-            "Valid options: FULL, SHORT"
-        );
-
         VERSION_TEXT_SIZE = NewEntry(Category.VERSION_TEXT, "fVersionTextSize", 20f,
             "The font size of the version text. Min = 10, Max = 40."
+        );
+
+        ALWAYS_SHORT_VERSION = NewEntry(Category.VERSION_TEXT, "bAlwaysShortVersion", true,
+            "If the custom version text should always show the short 'real' version.\n" +
+            "Thi will ignore mods like LC_API and MoreCompany that change the game version."
         );
         #endregion
 

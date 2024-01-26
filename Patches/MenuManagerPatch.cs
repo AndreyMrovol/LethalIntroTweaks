@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +13,7 @@ namespace IntroTweaks.Patches;
 
 [HarmonyPatch(typeof(MenuManager))]
 internal class MenuManagerPatch {
+    public static int realVer { get; internal set; }
     public static int gameVer { get; private set; }
     public static TextMeshProUGUI versionText { get; private set; }
 
@@ -79,39 +79,11 @@ internal class MenuManagerPatch {
 
             #region Handle MoreCompany edits if found.
             if (Plugin.ModInstalled("MoreCompany")) {
-                Plugin.Logger.LogDebug("MoreCompany found! Edits have been made to UI elements.");
-
                 fixCanvas = false;
 
-                GameObject mc = GameObject.Find("GlobalScale");
-                mc.GetComponentInParent<Canvas>().pixelPerfect = true;
-                GameObject cosmetics = mc.transform.Find("CosmeticsScreen").gameObject;
-
-                #region Tweak character spin area.
-                Transform spinArea = cosmetics.transform.Find("SpinAreaButton").transform;
-                spinArea.localScale = new(0.48f, 0.55f, 0.46f);
-                spinArea.position = new(421.65f, 245.7f, 200f);
-                #endregion
-
-                #region Button pos and bring to front.
-                Transform exit = cosmetics.transform.Find("ExitButton").transform;
-                Transform activate = FindInParent(cosmetics, "ActivateButton").transform;
-
-                Vector3 buttonPos = new(424.06f, 241.65f, 166.2f);
-                exit.position = activate.position = buttonPos;
-                exit.SetAsLastSibling();
-                #endregion
-
-                #region Change cosmetics border scale.
-                Transform border = cosmetics.transform.Find("CosmeticsHolderBorder").transform;
-                border.localScale = new(2.4f, 2.1f, 1);
-                #endregion
-
-                #region Header scale & position.
-                Transform header = Instance.menuButtons.transform.Find("HeaderImage").transform;
-                header.localScale = new(4.9f, 4.9f, 4.9f);
-                header.localPosition = new(header.localPosition.x, header.localPosition.y + 35, 0);
-                #endregion
+                bool fixedMC = FixMoreCompany();
+                string debugStr = fixedMC ? ". Edits have been made to its UI elements." : " but its UI elements do not exist!";
+                Plugin.Logger.LogDebug("MoreCompany found" + debugStr);
             }
             #endregion
 
@@ -152,7 +124,7 @@ internal class MenuManagerPatch {
         if (versionText == null) TryReplaceVersionText();
         else {
             // Make sure the text is correct.
-            versionText.text = versionText.text.Replace("$VERSION", gameVer.ToString());
+            versionText.text = versionText.text.Replace("$VERSION", $"{gameVer}");
 
             var textObj = versionText.gameObject;
             if (!textObj.activeSelf && onMenu) {
@@ -168,6 +140,45 @@ internal class MenuManagerPatch {
 
         if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
         versionText.gameObject.SetActive(false);
+    }
+
+    static bool FixMoreCompany() {
+        #region Grab references to MC UI elements.
+        GameObject mc = GameObject.Find("GlobalScale");
+        if (!mc) return false;
+
+        GameObject cosmetics = mc.transform.Find("CosmeticsScreen").gameObject;
+
+        mc.GetComponentInParent<Canvas>().pixelPerfect = true;
+        #endregion
+
+        #region Tweak character spin area.
+        Transform spinArea = cosmetics.transform.Find("SpinAreaButton").transform;
+        spinArea.localScale = new(0.48f, 0.55f, 0.46f);
+        spinArea.position = new(421.65f, 245.7f, 200f);
+        #endregion
+
+        #region Button pos and bring to front.
+        Transform exit = cosmetics.transform.Find("ExitButton").transform;
+        Transform activate = FindInParent(cosmetics, "ActivateButton").transform;
+
+        Vector3 buttonPos = new(424.06f, 241.65f, 166.2f);
+        exit.position = activate.position = buttonPos;
+        exit.SetAsLastSibling();
+        #endregion
+
+        #region Change cosmetics border scale.
+        Transform border = cosmetics.transform.Find("CosmeticsHolderBorder").transform;
+        border.localScale = new(2.4f, 2.1f, 1);
+        #endregion
+
+        #region Header scale & position.
+        Transform header = Instance.menuButtons.transform.Find("HeaderImage").transform;
+        header.localScale = new(4.9f, 4.9f, 4.9f);
+        header.localPosition = new(header.localPosition.x, header.localPosition.y + 35, 0);
+        #endregion
+
+        return mc != null;
     }
 
     static void RemoveCreditsButton(IEnumerable<GameObject> buttons) {
@@ -242,9 +253,9 @@ internal class MenuManagerPatch {
     }
 
     static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {
-        int realVer = GameNetworkManager.Instance.gameVersionNum;
-        string format = Plugin.Config.VERSION_TEXT_FORMAT.ToLower();
-        gameVer = Mathf.Abs(format.Equals("short") ? realVer - 16440 : realVer);
+        bool alwaysShort = Plugin.Config.ALWAYS_SHORT_VERSION;
+        int curVer = Math.Abs(GameNetworkManager.Instance.gameVersionNum);
+        gameVer = alwaysShort ? realVer : (curVer != realVer ? curVer : realVer);
 
         tmp.text = Plugin.Config.VERSION_TEXT;
         tmp.fontSize = Mathf.Clamp(Plugin.Config.VERSION_TEXT_SIZE, 10, 40);

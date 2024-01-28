@@ -198,7 +198,7 @@ internal class MenuManagerPatch {
             var cur = obj.transform;
             var pos = cur.localPosition;
 
-            if (RectUtil.IsAbove(obj.transform, creditsRect)) {
+            if (obj.transform.IsAbove(creditsRect)) {
                 cur.localPosition = new(pos.x, pos.y - creditsHeight, pos.z);
             }
         });
@@ -207,21 +207,28 @@ internal class MenuManagerPatch {
     }
 
     static void AlignButtons(IEnumerable<GameObject> buttons) {
-        Vector3 hostButtonPos = buttons.First(b => b.name == "HostButton")
-            .GetComponent<RectTransform>().localPosition;
+        RectTransform hostButton = buttons
+            .First(b => b.name == "HostButton")
+            .GetComponent<RectTransform>();
+
+        hostButton.SetLocalX(hostButton.localPosition.x + 15);
 
         foreach (GameObject obj in buttons) {
-            if (!obj) continue;
+            if (!obj) {
+                Plugin.Logger.LogDebug($"Could not align button {obj.name}");
+                continue;
+            }
 
             #region Move right slightly.
             RectTransform rect = obj.GetComponent<RectTransform>();
-            rect.localPosition = new(hostButtonPos.x + 15, rect.localPosition.y, hostButtonPos.z);
+            rect.sizeDelta = hostButton.sizeDelta;
+            rect.localPosition = new(hostButton.localPosition.x, rect.localPosition.y, hostButton.localPosition.z);
             #endregion
 
             #region Fix text mesh settings
-            TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI text = obj.GetComponentInChildren<TextMeshProUGUI>(true);
 
-            FixScale(text.gameObject);
+            text.transform.FixScale();
             TweakTextSettings(text);
 
             text.fontSize = 15;
@@ -230,9 +237,8 @@ internal class MenuManagerPatch {
 
             #region Fix button text rect
             var textRect = text.gameObject.GetComponent<RectTransform>();
-            RectUtil.ResetAnchoredPos(textRect);
-            RectUtil.ResetSizeDelta(textRect);
-            RectUtil.EditOffsets(textRect, Vector2.zero, new(5, 0));
+            textRect.ResetAnchoredPos();
+            textRect.EditOffsets(Vector2.zero, new(5, 0));
             #endregion
         }
 
@@ -247,7 +253,7 @@ internal class MenuManagerPatch {
         clone.name = "VersionNumberText";
 
         versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-        RectUtil.AnchorToBottom(versionText.gameObject.GetComponent<RectTransform>());
+        versionText.gameObject.GetComponent<RectTransform>().AnchorToBottom();
 
         VersionNum.SetActive(false);
     }
@@ -286,15 +292,11 @@ internal class MenuManagerPatch {
     static void FixPanelAlignment(Transform panel) {
         var rect = panel.gameObject.GetComponent<RectTransform>();
 
-        RectUtil.ResetSizeDelta(rect);
-        RectUtil.ResetAnchoredPos(rect);
-        RectUtil.EditOffsets(rect, new(-20, -25), new(20, 25));
+        rect.ResetSizeDelta();
+        rect.ResetAnchoredPos();
+        rect.EditOffsets(new(-20, -25), new(20, 25));
 
-        FixScale(panel.gameObject);
-    }
-
-    internal static void FixScale(GameObject obj) {
-        obj.transform.localScale = new(1.02f, 1.06f, 1.02f);
+        panel.FixScale();
     }
 
     static GameObject GetButton(Transform panel, string name) {

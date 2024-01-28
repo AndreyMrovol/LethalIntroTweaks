@@ -80,12 +80,12 @@ public class Config {
             "If the main menu buttons should align with each other."
         );
 
-        FIX_MENU_CANVAS = NewEntry(Category.MENU_TWEAKS, "bFixMenuCanvas", true,
+        FIX_MENU_CANVAS = NewEntry(Category.MENU_TWEAKS, "bFixMenuCanvas", false,
             "Whether the main menu canvas should have its settings corrected.\n" +
             "May cause overlapping issues, only turn it on if you aren't using other menu mods."
         );
 
-        FIX_MENU_PANELS = NewEntry(Category.MENU_TWEAKS, "bFixMenuPanels", true,
+        FIX_MENU_PANELS = NewEntry(Category.MENU_TWEAKS, "bFixMenuPanels", false,
             "The main menu panels (host, servers, loading screen) all have anchoring, offset and sizing issues.\n" +
             "This option helps solve them and improve the look of the menu.\n\nMAY BREAK SOME MODS."
         );

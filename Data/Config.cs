@@ -5,39 +5,40 @@ namespace IntroTweaks.Data;
 public class Config {
     #region Properties
     #region General
-    public bool PLUGIN_ENABLED { get; private set; }
+    public ConfigEntry<bool> PLUGIN_ENABLED { get; private set; }
     #endregion
 
     #region Intro Tweaks
-    public bool SKIP_SPLASH_SCREENS { get; private set; }
-    public bool SKIP_BOOT_ANIMATION { get; private set; }
+    public ConfigEntry<bool> SKIP_SPLASH_SCREENS { get; private set; }
+    public ConfigEntry<bool> SKIP_BOOT_ANIMATION { get; private set; }
 
-    public string AUTO_SELECT_MODE { get; private set; }
-    public bool AUTO_SELECT_HOST { get; private set; }
+    public ConfigEntry<string> AUTO_SELECT_MODE { get; private set; }
+    public ConfigEntry<bool> AUTO_SELECT_HOST { get; private set; }
     #endregion
 
     #region Menu Tweaks
-    public bool ALIGN_MENU_BUTTONS { get; private set; }
-    public bool FIX_MENU_CANVAS { get; private set; }
-    public bool FIX_MENU_PANELS { get; private set; }
+    public ConfigEntry<bool> ALIGN_MENU_BUTTONS { get; private set; }
+    public ConfigEntry<bool> FIX_MENU_CANVAS { get; private set; }
+    public ConfigEntry<bool> FIX_MENU_PANELS { get; private set; }
     //public bool IMPROVE_HOST_SCREEN { get; private set; }
 
-    public bool REMOVE_LAN_WARNING { get; private set; }
-    public bool REMOVE_LAUNCHED_IN_LAN { get; private set; }
-    public bool REMOVE_NEWS_PANEL { get; private set; }
-    public bool REMOVE_CREDITS_BUTTON { get; private set; }
+    public ConfigEntry<bool> REMOVE_LAN_WARNING { get; private set; }
+    public ConfigEntry<bool> REMOVE_LAUNCHED_IN_LAN { get; private set; }
+    public ConfigEntry<bool> REMOVE_NEWS_PANEL { get; private set; }
+    public ConfigEntry<bool> REMOVE_CREDITS_BUTTON { get; private set; }
     #endregion
 
     #region Version Text
-    public bool CUSTOM_VERSION_TEXT { get; private set; }
-    public string VERSION_TEXT { get; private set; }
-    public float VERSION_TEXT_SIZE { get; private set; }
-    public bool ALWAYS_SHORT_VERSION { get; private set; }
+    public ConfigEntry<bool> CUSTOM_VERSION_TEXT { get; private set; }
+    public ConfigEntry<string> VERSION_TEXT { get; private set; }
+    public ConfigEntry<float> VERSION_TEXT_SIZE { get; private set; }
+    public ConfigEntry<float> VERSION_TEXT_OFFSET { get; private set; }
+    public ConfigEntry<bool> ALWAYS_SHORT_VERSION { get; private set; }
     #endregion
 
     #region Misc
-    public bool DISABLE_FIRST_DAY_SFX { get; private set; }
-    public int GAME_STARTUP_DISPLAY { get; private set; }
+    public ConfigEntry<bool> DISABLE_FIRST_DAY_SFX { get; private set; }
+    public ConfigEntry<int> GAME_STARTUP_DISPLAY { get; private set; }
     #endregion
 
     readonly ConfigFile configFile;
@@ -53,11 +54,11 @@ public class Config {
         );
     }
 
-    private T NewEntry<T>(string key, T defaultVal, string desc) =>
+    private ConfigEntry<T> NewEntry<T>(string key, T defaultVal, string desc) =>
         NewEntry(Category.GENERAL, key, defaultVal, desc);
 
-    private T NewEntry<T>(Category category, string key, T defaultVal, string desc) =>
-        configFile.Bind(category.Value, key, defaultVal, desc).Value;
+    private ConfigEntry<T> NewEntry<T>(Category category, string key, T defaultVal, string desc) =>
+        configFile.Bind(category.Value, key, defaultVal, desc);
 
     public void InitBindings() {
         #region Options related to the intro.
@@ -82,7 +83,7 @@ public class Config {
 
         FIX_MENU_CANVAS = NewEntry(Category.MENU_TWEAKS, "bFixMenuCanvas", false,
             "Whether the main menu canvas should have its settings corrected.\n" +
-            "May cause overlapping issues, only turn it on if you aren't using other menu mods."
+            "May cause overlapping issues, only enable it if you don't use other mods that edit the menu."
         );
 
         FIX_MENU_PANELS = NewEntry(Category.MENU_TWEAKS, "bFixMenuPanels", false,
@@ -123,6 +124,11 @@ public class Config {
 
         VERSION_TEXT_SIZE = NewEntry(Category.VERSION_TEXT, "fVersionTextSize", 20f,
             "The font size of the version text. Min = 10, Max = 40."
+        );
+
+        VERSION_TEXT_OFFSET = NewEntry(Category.VERSION_TEXT, "fVersionTextOffset", 0f,
+            "Use this option to adjust the Y position of the version text if it's out of place.\n" +
+            "For example, when using 3 lines of text, a small positive value would move it back up."
         );
 
         ALWAYS_SHORT_VERSION = NewEntry(Category.VERSION_TEXT, "bAlwaysShortVersion", true,

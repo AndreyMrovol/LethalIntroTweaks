@@ -12,8 +12,6 @@ using IntroTweaks.Core;
 using BepInEx.Bootstrap;
 using System.Linq;
 using IntroTweaks.Data;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace IntroTweaks;
 
@@ -30,15 +28,11 @@ public class Plugin : BaseUnityPlugin {
 
     // May want to use 'Keys' for this in future.
     public static bool ModInstalled(string name) {
-        return CheckForMods([name]);
-    }
-
-    // May want to use 'Keys' for this in future.
-    public static bool CheckForMods(IEnumerable<string> names) {
-        names = names.Select(n => n.ToLower());
+        name = name.ToLower();
 
         return Chainloader.PluginInfos.Values.Any(p => 
-            names.Contains(p.Metadata.GUID.ToLower())
+            p.Metadata.GUID.ToLower().Contains(name) || 
+            p.Metadata.Name.ToLower() == name
         );
     }
 

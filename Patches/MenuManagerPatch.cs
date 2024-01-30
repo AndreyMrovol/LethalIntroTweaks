@@ -77,18 +77,18 @@ internal class MenuManagerPatch {
             }
             #endregion
 
-            bool fixCanvas = Cfg.FIX_MENU_CANVAS.Value;
+            #region Handle More/AdvancedCompany edits if found.
+            bool mcInstalled = Plugin.ModInstalled("MoreCompany");
+            bool acInstalled = Plugin.ModInstalled("AdvancedCompany");
 
-            #region Handle MoreCompany edits if found.
-            if (Plugin.CheckForMods(["MoreCompany", "AdvancedCompany"])) {
-                fixCanvas = false;
-
+            if (mcInstalled && !acInstalled) {
                 bool fixedMC = FixMoreCompany();
                 string debugStr = fixedMC ? ". Edits have been made to its UI elements." : " but its UI elements do not exist!";
                 Plugin.Logger.LogDebug("MoreCompany found" + debugStr);
             }
             #endregion
 
+            bool fixCanvas = Cfg.FIX_MENU_CANVAS.Value && !acInstalled;
             TweakCanvasSettings(Instance.menuButtons, fixCanvas);
         }
         catch (Exception e) {

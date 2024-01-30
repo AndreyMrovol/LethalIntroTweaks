@@ -1,6 +1,10 @@
 # Changelog History
 This list is reads from bottom to top, with latest versions first.
 
+## v1.4.3
+- 
+- 
+
 ## v1.4.2
 - Fixed header/logo disappearing when navigating menus.
 - Fixed the **LethalConfig** button being below the Quit button.

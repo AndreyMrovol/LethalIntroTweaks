@@ -1,4 +1,5 @@
 using HarmonyLib;
+using IntroTweaks.Data;
 using IntroTweaks.Utils;
 using System;
 using System.Collections;
@@ -24,6 +25,7 @@ internal class MenuManagerPatch {
     internal static Transform MenuPanel = null;
 
     static MenuManager Instance;
+    static Config Cfg => Plugin.Config;
 
     [HarmonyPostfix]
     [HarmonyPatch("Start")]
@@ -50,7 +52,7 @@ internal class MenuManagerPatch {
 
     static void PatchMenu() {
         try {
-            if (Plugin.Config.FIX_MENU_PANELS) {
+            if (Cfg.FIX_MENU_PANELS.Value) {
                 // Make the white space equal on both sides of the panel.
                 FixPanelAlignment(MenuPanel);
 
@@ -66,19 +68,19 @@ internal class MenuManagerPatch {
                 .GetComponentsInChildren<Button>(true)
                 .Select(b => b.gameObject);
 
-            if (Plugin.Config.ALIGN_MENU_BUTTONS) {
+            if (Cfg.ALIGN_MENU_BUTTONS.Value) {
                 AlignButtons(buttons);
             }
 
-            if (Plugin.Config.REMOVE_CREDITS_BUTTON) {
+            if (Cfg.REMOVE_CREDITS_BUTTON.Value) {
                 RemoveCreditsButton(buttons);
             }
             #endregion
 
-            bool fixCanvas = Plugin.Config.FIX_MENU_CANVAS;
+            bool fixCanvas = Cfg.FIX_MENU_CANVAS.Value;
 
             #region Handle MoreCompany edits if found.
-            if (Plugin.ModInstalled("MoreCompany")) {
+            if (Plugin.CheckForMods(["MoreCompany", "AdvancedCompany"])) {
                 fixCanvas = false;
 
                 bool fixedMC = FixMoreCompany();
@@ -94,15 +96,15 @@ internal class MenuManagerPatch {
         }
 
         #region Hide UI elements
-        if (Plugin.Config.REMOVE_NEWS_PANEL) {
+        if (Cfg.REMOVE_NEWS_PANEL.Value) {
             Instance.NewsPanel.SetActive(false);
         }
 
-        if (Plugin.Config.REMOVE_LAN_WARNING) {
+        if (Cfg.REMOVE_LAN_WARNING.Value) {
             Instance.lanWarningContainer.SetActive(false);
         }
 
-        if (Plugin.Config.REMOVE_LAUNCHED_IN_LAN) {
+        if (Cfg.REMOVE_LAUNCHED_IN_LAN.Value) {
             GameObject lanModeText = Instance.launchedInLanModeText?.gameObject;
             if (lanModeText) {
                 lanModeText.SetActive(false);
@@ -110,7 +112,7 @@ internal class MenuManagerPatch {
         }
         #endregion
 
-        if (Plugin.Config.AUTO_SELECT_HOST) {
+        if (Cfg.AUTO_SELECT_HOST.Value) {
             Instance.ClickHostButton();
         }
     }
@@ -138,7 +140,7 @@ internal class MenuManagerPatch {
     static void DisableMenuOnHost(MenuManager __instance) {
         __instance.menuButtons.SetActive(false);
 
-        if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
+        if (!Cfg.CUSTOM_VERSION_TEXT.Value) return;
         versionText.gameObject.SetActive(false);
     }
 
@@ -246,7 +248,7 @@ internal class MenuManagerPatch {
     }
 
     internal static void TryReplaceVersionText() {
-        if (!Plugin.Config.CUSTOM_VERSION_TEXT) return;
+        if (!Cfg.CUSTOM_VERSION_TEXT.Value) return;
         if (VersionNum == null || MenuPanel == null) return;
 
         GameObject clone = Object.Instantiate(VersionNum, MenuPanel);
@@ -259,12 +261,12 @@ internal class MenuManagerPatch {
     }
 
     static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {
-        bool alwaysShort = Plugin.Config.ALWAYS_SHORT_VERSION;
+        bool alwaysShort = Cfg.ALWAYS_SHORT_VERSION.Value;
         int curVer = Math.Abs(GameNetworkManager.Instance.gameVersionNum);
         gameVer = alwaysShort ? realVer : (curVer != realVer ? curVer : realVer);
 
-        tmp.text = Plugin.Config.VERSION_TEXT;
-        tmp.fontSize = Mathf.Clamp(Plugin.Config.VERSION_TEXT_SIZE, 10, 40);
+        tmp.text = Cfg.VERSION_TEXT.Value;
+        tmp.fontSize = Mathf.Clamp(Cfg.VERSION_TEXT_SIZE.Value, 10, 40);
         tmp.alignment = TextAlignmentOptions.Center;
 
         TweakTextSettings(tmp);
@@ -280,7 +282,7 @@ internal class MenuManagerPatch {
     }
 
     static void TweakCanvasSettings(GameObject panel, bool changeRenderMode) {
-        // This is more future-proof than `panel.transform.parent.parent`.
+        // More future-proof than `panel.transform.parent.parent`.
         var canvas = panel.GetComponentInParent<Canvas>();
         canvas.pixelPerfect = true;
 

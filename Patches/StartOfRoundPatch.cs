@@ -14,7 +14,7 @@ internal class StartOfRoundPatch {
             yield return result.Current;
         }
 
-        if (Plugin.Config.DISABLE_FIRST_DAY_SFX) {
+        if (Plugin.Config.DISABLE_FIRST_DAY_SFX.Value) {
             StopSpeaker(__instance.speakerAudioSource);
         }
     }

@@ -133,7 +133,7 @@ public class Config {
 
         ALWAYS_SHORT_VERSION = NewEntry(Category.VERSION_TEXT, "bAlwaysShortVersion", true,
             "If the custom version text should always show the short 'real' version.\n" +
-            "Thi will ignore mods like LC_API and MoreCompany that change the game version."
+            "This will ignore mods like LC_API and MoreCompany that change the game version."
         );
         #endregion
 

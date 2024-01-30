@@ -12,6 +12,8 @@ using IntroTweaks.Core;
 using BepInEx.Bootstrap;
 using System.Linq;
 using IntroTweaks.Data;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace IntroTweaks;
 
@@ -28,11 +30,15 @@ public class Plugin : BaseUnityPlugin {
 
     // May want to use 'Keys' for this in future.
     public static bool ModInstalled(string name) {
-        name = name.ToLower();
+        return CheckForMods([name]);
+    }
+
+    // May want to use 'Keys' for this in future.
+    public static bool CheckForMods(IEnumerable<string> names) {
+        names = names.Select(n => n.ToLower());
 
         return Chainloader.PluginInfos.Values.Any(p => 
-            p.Metadata.GUID.ToLower().Contains(name) || 
-            p.Metadata.Name.ToLower() == name
+            names.Contains(p.Metadata.GUID.ToLower())
         );
     }
 
@@ -44,12 +50,12 @@ public class Plugin : BaseUnityPlugin {
 
         SceneManager.sceneLoaded += SceneLoaded;
 
-        if (Config.SKIP_SPLASH_SCREENS) {
+        if (Config.SKIP_SPLASH_SCREENS.Value) {
             Task.Run(SkipSplashScreen);
         }
 
         Config.InitBindings();
-        SelectedMode = Config.AUTO_SELECT_MODE.ToLower();
+        SelectedMode = Config.AUTO_SELECT_MODE.Value.ToLower();
 
         try {
             patcher = new(Metadata.GUID);
@@ -63,7 +69,7 @@ public class Plugin : BaseUnityPlugin {
     }
 
     public bool PluginEnabled(bool logDisabled = false) {
-        bool enabled = Config.PLUGIN_ENABLED;
+        bool enabled = Config.PLUGIN_ENABLED.Value;
         if (!enabled && logDisabled) {
             Logger.LogInfo("IntroTweaks disabled globally.");
         }

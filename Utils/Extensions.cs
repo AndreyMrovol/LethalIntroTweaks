@@ -37,8 +37,9 @@ internal static class Extensions {
         EditAnchors(rect, new(0.5f, 0), new(0.5f, 0));
         EditOffsets(rect, new(0, 0), new(0, 0));
 
+        float offset = Plugin.Config.VERSION_TEXT_OFFSET.Value;
+        rect.localPosition = new(0, -205 + offset, 0);
         rect.localRotation = Quaternion.identity;
-        rect.localPosition = new(0, -205, 0);
     }
 
     internal static void SetLocalX(this RectTransform rect, float newX) {

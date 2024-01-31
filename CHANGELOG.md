@@ -2,8 +2,19 @@
 This list is reads from bottom to top, with latest versions first.
 
 ## v1.4.3
-- 
-- 
+### Deleting your config file is recommended!
+
+- Fixed wrong version showing by replacing `sVersionTextFormat` with `bAlwaysShortVersion`.
+- All config options now use `ConfigEntry` to enable runtime editing with things like [ConfigurationManager](https://github.com/BepInEx/BepInEx.ConfigurationManager).
+- Improved consistency of button alignment by matching their `sizeDelta` with the host button.
+<p>
+
+- Added new `fVersionTextOffset` adjust the Y (up/down) position of the version text.
+  - You should use this option when the text appears out of place due to a multi-line or aspect ratio issue.
+<p>
+
+- Improved compatibility with **AdvancedCompany** by disabling the canvas fix regardless of `bFixMenuCanvas`.
+    - This fixes the character being drawn as a black silhouette on the cosmetics page.
 
 ## v1.4.2
 - Fixed header/logo disappearing when navigating menus.

@@ -3,10 +3,11 @@ This list is reads from bottom to top, with latest versions first.
 
 ## v1.4.3
 ### Deleting your config file is recommended!
-
 - Fixed wrong version showing by replacing `sVersionTextFormat` with `bAlwaysShortVersion`.
-- All config options now use `ConfigEntry` to enable runtime editing with things like [ConfigurationManager](https://github.com/BepInEx/BepInEx.ConfigurationManager).
 - Improved consistency of button alignment by matching their `sizeDelta` with the host button.
+- All config options now use `ConfigEntry` to enable runtime editing with things like [ConfigurationManager](https://github.com/BepInEx/BepInEx.ConfigurationManager).
+- Version text is now updated in realtime when changing related config options.
+    > Essentially, you no longer need to restart. Use **LethalConfig** to instantly see your changes.
 <p>
 
 - Added new `fVersionTextOffset` adjust the Y (up/down) position of the version text.

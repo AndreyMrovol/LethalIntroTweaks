@@ -4,6 +4,7 @@ using IntroTweaks.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -16,13 +17,15 @@ namespace IntroTweaks.Patches;
 internal class MenuManagerPatch {
     public static int realVer { get; internal set; }
     public static int gameVer { get; private set; }
-    public static TextMeshProUGUI versionText { get; private set; }
 
-    public static Color32 DARK_ORANGE = new(175, 115, 0, 255);
+    public static TextMeshProUGUI versionText { get; private set; }
+    public static RectTransform versionTextRect { get; private set; }
 
     internal static GameObject VersionNum = null;
     internal static Transform MenuContainer = null;
     internal static Transform MenuPanel = null;
+
+    public static Color32 DARK_ORANGE = new(175, 115, 0, 255);
 
     static MenuManager Instance;
     static Config Cfg => Plugin.Config;
@@ -51,6 +54,15 @@ internal class MenuManagerPatch {
     }
 
     static void PatchMenu() {
+        Cfg.ALWAYS_SHORT_VERSION.SettingChanged += (object s, EventArgs e) =>
+            SetVersion();
+
+        Cfg.VERSION_TEXT_SIZE.SettingChanged += (object s, EventArgs e) =>
+            versionText.fontSize = Cfg.VERSION_TEXT_SIZE.ClampedValue(10, 40);
+
+        Cfg.VERSION_TEXT_OFFSET.SettingChanged += (object s, EventArgs e) => 
+            versionTextRect.RefreshPosition();
+
         try {
             if (Cfg.FIX_MENU_PANELS.Value) {
                 // Make the white space equal on both sides of the panel.
@@ -126,7 +138,7 @@ internal class MenuManagerPatch {
         if (versionText == null) TryReplaceVersionText();
         else {
             // Make sure the text is correct.
-            versionText.text = versionText.text.Replace("$VERSION", $"{gameVer}");
+            versionText.text = Cfg.VERSION_TEXT.Value.Replace("$VERSION", $"{gameVer}");
 
             var textObj = versionText.gameObject;
             if (!textObj.activeSelf && onMenu) {
@@ -162,7 +174,7 @@ internal class MenuManagerPatch {
 
         #region Button pos and bring to front.
         Transform exit = cosmetics.transform.Find("ExitButton").transform;
-        Transform activate = FindInParent(cosmetics, "ActivateButton").transform;
+        Transform activate = cosmetics.FindInParent("ActivateButton").transform;
 
         Vector3 buttonPos = new(424.06f, 241.65f, 166.2f);
         exit.position = activate.position = buttonPos;
@@ -255,18 +267,23 @@ internal class MenuManagerPatch {
         clone.name = "VersionNumberText";
 
         versionText = InitTextMesh(clone.GetComponent<TextMeshProUGUI>());
-        versionText.gameObject.GetComponent<RectTransform>().AnchorToBottom();
+        versionTextRect = versionText.gameObject.GetComponent<RectTransform>();
+        versionTextRect.AnchorToBottom();
 
         VersionNum.SetActive(false);
     }
 
-    static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {
+    static void SetVersion() {
         bool alwaysShort = Cfg.ALWAYS_SHORT_VERSION.Value;
         int curVer = Math.Abs(GameNetworkManager.Instance.gameVersionNum);
         gameVer = alwaysShort ? realVer : (curVer != realVer ? curVer : realVer);
+    }
+
+    static TextMeshProUGUI InitTextMesh(TextMeshProUGUI tmp) {
+        SetVersion();
 
         tmp.text = Cfg.VERSION_TEXT.Value;
-        tmp.fontSize = Mathf.Clamp(Cfg.VERSION_TEXT_SIZE.Value, 10, 40);
+        tmp.fontSize = Cfg.VERSION_TEXT_SIZE.ClampedValue(10, 40);
         tmp.alignment = TextAlignmentOptions.Center;
 
         TweakTextSettings(tmp);
@@ -277,7 +294,6 @@ internal class MenuManagerPatch {
     static void TweakTextSettings(TextMeshProUGUI tmp, bool overflow = true, bool wordWrap = false) {
         if (overflow) tmp.overflowMode = TextOverflowModes.Overflow;
         tmp.enableWordWrapping = wordWrap;
-
         tmp.faceColor = DARK_ORANGE;
     }
 
@@ -299,25 +315,5 @@ internal class MenuManagerPatch {
         rect.EditOffsets(new(-20, -25), new(20, 25));
 
         panel.FixScale();
-    }
-
-    static GameObject GetButton(Transform panel, string name) {
-        try {
-            return panel.Find(name).gameObject;
-        } catch(Exception e) { 
-            Plugin.Logger.LogError($"Error getting button: {name}\n{e}");
-            return null;
-        }
-    }
-
-    static GameObject FindInParent(GameObject obj, string name) {
-        Transform parent = obj.transform.parent;
-
-        try {
-            return parent.Find(name).gameObject;
-        } catch(Exception e) { 
-            Plugin.Logger.LogError($"Error finding '{name}' in: {parent.name}\n{e}");
-            return null;
-        }
     }
 }

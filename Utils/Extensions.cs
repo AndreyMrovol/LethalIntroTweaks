@@ -1,8 +1,21 @@
+using BepInEx.Configuration;
+using System;
 using UnityEngine;
 
 namespace IntroTweaks.Utils;
 
 internal static class Extensions {
+    internal static GameObject FindInParent(this GameObject obj, string name) {
+        Transform parent = obj.transform.parent;
+
+        try {
+            return parent.Find(name).gameObject;
+        } catch(Exception e) { 
+            Plugin.Logger.LogError($"Error finding '{name}' in: {parent.name}\n{e}");
+            return null;
+        }
+    }
+
     internal static bool IsAbove(this Transform cur, Transform target) {
         return cur.localPosition.y > target.localPosition.y;
     }
@@ -37,6 +50,10 @@ internal static class Extensions {
         EditAnchors(rect, new(0.5f, 0), new(0.5f, 0));
         EditOffsets(rect, new(0, 0), new(0, 0));
 
+        rect.RefreshPosition();
+    }
+
+    internal static void RefreshPosition(this RectTransform rect) {
         float offset = Plugin.Config.VERSION_TEXT_OFFSET.Value;
         rect.localPosition = new(0, -205 + offset, 0);
         rect.localRotation = Quaternion.identity;
@@ -48,5 +65,9 @@ internal static class Extensions {
 
     internal static void FixScale(this Transform transform) {
         transform.localScale = new(1.02f, 1.06f, 1.02f);
+    }
+    
+    internal static float ClampedValue(this ConfigEntry<float> entry, float min, float max) {
+        return Mathf.Clamp(entry.Value, min, max);
     }
 }

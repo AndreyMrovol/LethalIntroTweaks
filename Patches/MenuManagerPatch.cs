@@ -109,11 +109,11 @@ internal class MenuManagerPatch {
 
         #region Hide UI elements
         if (Cfg.REMOVE_NEWS_PANEL.Value) {
-            Instance.NewsPanel.SetActive(false);
+            Instance.NewsPanel?.SetActive(false);
         }
 
         if (Cfg.REMOVE_LAN_WARNING.Value) {
-            Instance.lanWarningContainer.SetActive(false);
+            Instance.lanWarningContainer?.SetActive(false);
         }
 
         if (Cfg.REMOVE_LAUNCHED_IN_LAN.Value) {
@@ -149,11 +149,8 @@ internal class MenuManagerPatch {
 
     [HarmonyPrefix]
     [HarmonyPatch("ClickHostButton")]
-    static void DisableMenuOnHost(MenuManager __instance) {
-        __instance.menuButtons.SetActive(false);
-
-        if (!Cfg.CUSTOM_VERSION_TEXT.Value) return;
-        versionText.gameObject.SetActive(false);
+    static void DisableMenuOnHost() {
+        MenuPanel?.gameObject.SetActive(false);
     }
 
     static bool FixMoreCompany() {

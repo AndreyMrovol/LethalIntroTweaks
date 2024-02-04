@@ -89,18 +89,25 @@ internal class MenuManagerPatch {
             }
             #endregion
 
-            #region Handle More/AdvancedCompany edits if found.
-            bool mcInstalled = Plugin.ModInstalled("MoreCompany");
-            bool acInstalled = Plugin.ModInstalled("AdvancedCompany");
+            #region Handle MoreCompany/AdvancedCompany.
+            bool fixCanvas = Cfg.FIX_MENU_CANVAS.Value;
 
-            if (mcInstalled && !acInstalled) {
-                bool fixedMC = FixMoreCompany();
-                string debugStr = fixedMC ? ". Edits have been made to its UI elements." : " but its UI elements do not exist!";
-                Plugin.Logger.LogDebug("MoreCompany found" + debugStr);
+            bool acInstalled = Plugin.ModInstalled("AdvancedCompany");
+            bool mcInstalled = Plugin.ModInstalled("MoreCompany");
+
+            if (acInstalled || mcInstalled) {
+                fixCanvas = false;
+            }
+
+            if (Cfg.FIX_MORE_COMPANY.Value) {
+                if (mcInstalled && !acInstalled) {
+                    bool fixedMC = FixMoreCompany();
+                    string debugStr = fixedMC ? ". Edits have been made to its UI elements." : " but its UI elements do not exist!";
+                    Plugin.Logger.LogDebug("MoreCompany found" + debugStr);
+                }
             }
             #endregion
 
-            bool fixCanvas = Cfg.FIX_MENU_CANVAS.Value && !acInstalled;
             TweakCanvasSettings(Instance.menuButtons, fixCanvas);
         }
         catch (Exception e) {
@@ -170,11 +177,11 @@ internal class MenuManagerPatch {
         #endregion
 
         #region Button pos and bring to front.
-        Transform exit = cosmetics.transform.Find("ExitButton").transform;
-        Transform activate = cosmetics.FindInParent("ActivateButton").transform;
+        var activate = cosmetics.FindInParent("ActivateButton").GetComponent<RectTransform>();
+        var exit = cosmetics.transform.Find("ExitButton").GetComponent<RectTransform>();
 
-        Vector3 buttonPos = new(424.06f, 241.65f, 166.2f);
-        exit.position = activate.position = buttonPos;
+        activate.AnchorToBottomRight();
+        exit.AnchorToBottomRight();
         exit.SetAsLastSibling();
         #endregion
 

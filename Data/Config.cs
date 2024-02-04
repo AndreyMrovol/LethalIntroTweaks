@@ -20,6 +20,7 @@ public class Config {
     public ConfigEntry<bool> ALIGN_MENU_BUTTONS { get; private set; }
     public ConfigEntry<bool> FIX_MENU_CANVAS { get; private set; }
     public ConfigEntry<bool> FIX_MENU_PANELS { get; private set; }
+    public ConfigEntry<bool> FIX_MORE_COMPANY { get; internal set; }
     //public bool IMPROVE_HOST_SCREEN { get; private set; }
 
     public ConfigEntry<bool> REMOVE_LAN_WARNING { get; private set; }
@@ -89,6 +90,12 @@ public class Config {
         FIX_MENU_PANELS = NewEntry(Category.MENU_TWEAKS, "bFixMenuPanels", false,
             "The main menu panels (host, servers, loading screen) all have anchoring, offset and sizing issues.\n" +
             "This option helps solve them and improve the look of the menu.\n\nMAY BREAK SOME MODS."
+        );
+
+        FIX_MORE_COMPANY = NewEntry(Category.MENU_TWEAKS, "bFixMoreCompany", true,
+            "Whether to apply fixes to MoreCompany UI elements.\n" +
+            "Fixes include: button placement, header positioning & scaling of cosmetics border.\n\n" +
+            "PRONE TO INCOMPATIBILITIES! TURN THIS OFF IF YOU ENCOUNTER BREAKING BUGS."
         );
 
         //IMPROVE_HOST_SCREEN = NewEntry(Category.MENU_TWEAKS, "bImproveHostScreen", true,

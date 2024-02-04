@@ -43,12 +43,20 @@ internal static class Extensions {
         rect.anchorMin = min;
     }
 
-    internal static void AnchorToBottom(this RectTransform rect) {
-        ResetSizeDelta(rect);
-        ResetAnchoredPos(rect);
+    internal static void AnchorToBottomRight(this RectTransform rect) {
+        rect.ResetAnchoredPos();
+        rect.EditAnchors(new(1, 0), new(1, 0));
 
-        EditAnchors(rect, new(0.5f, 0), new(0.5f, 0));
-        EditOffsets(rect, new(0, 0), new(0, 0));
+        rect.localPosition = new(432, -222, 0);
+        rect.localRotation = Quaternion.identity;
+    }
+
+    internal static void AnchorToBottom(this RectTransform rect) {
+        rect.ResetSizeDelta();
+        rect.ResetAnchoredPos();
+
+        rect.EditAnchors(new(0.5f, 0), new(0.5f, 0));
+        rect.EditOffsets(new(0, 0), new(0, 0));
 
         rect.RefreshPosition();
     }

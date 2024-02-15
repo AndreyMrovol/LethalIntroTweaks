@@ -38,6 +38,7 @@ public class Config {
     #endregion
 
     #region Misc
+    public ConfigEntry<bool> AUTO_START_GAME { get; private set; }
     public ConfigEntry<bool> DISABLE_FIRST_DAY_SFX { get; private set; }
     public ConfigEntry<int> GAME_STARTUP_DISPLAY { get; private set; }
     #endregion
@@ -67,7 +68,7 @@ public class Config {
             "If the loading animation (booting OS) should be skipped."
         );
 
-        AUTO_SELECT_MODE = NewEntry(Category.INTRO_TWEAKS, "sAutoSelectMode", "ONLINE",
+        AUTO_SELECT_MODE = NewEntry(Category.INTRO_TWEAKS, "sAutoSelectMode", "OFF",
             "Which mode to automatically enter into after the splash screen.\n" +
             "Valid options: ONLINE, LAN, OFF"
         );
@@ -145,6 +146,10 @@ public class Config {
         #endregion
 
         #region Misc options
+        AUTO_START_GAME = NewEntry(Category.MISC, "bAutoStartGame", false, 
+            "If enabled, the lever will be pulled automatically to begin the landing sequence."
+        );
+
         DISABLE_FIRST_DAY_SFX = NewEntry(Category.MISC, "bDisableFirstDaySFX", false,
             "Toggles the first day ship speaker SFX."
         );

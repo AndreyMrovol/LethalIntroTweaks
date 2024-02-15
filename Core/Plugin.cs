@@ -5,7 +5,6 @@ using BepInEx.Logging;
 using HarmonyLib;
 
 using static UnityEngine.Rendering.SplashScreen;
-using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 using IntroTweaks.Core;
@@ -76,7 +75,7 @@ public class Plugin : BaseUnityPlugin {
 
         // Not really a 'real' skip, but good enough for the time being.
         while (!menuLoaded) {
-            SplashScreen.Stop(StopBehavior.StopImmediate);
+            Stop(StopBehavior.StopImmediate);
         };
     }
 

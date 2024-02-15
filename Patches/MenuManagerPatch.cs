@@ -30,6 +30,7 @@ internal class MenuManagerPatch {
     static Config Cfg => Plugin.Config;
 
     [HarmonyPostfix]
+    [HarmonyPriority(Priority.High)]
     [HarmonyPatch("Start")]
     static void Init(MenuManager __instance) {
         Instance = __instance;

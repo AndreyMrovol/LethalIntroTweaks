@@ -1,3 +1,6 @@
+> [!WARNING]
+> **NO LONGER MAINTAINED**
+
 <img align="right" width="150" height="150" src="https://gcdn.thunderstore.io/live/repository/icons/Owen3H-IntroTweaks-1.2.2.png.128x128_q95.jpg">
 
 # IntroTweaks

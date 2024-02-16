@@ -30,7 +30,6 @@ internal class MenuManagerPatch {
     static Config Cfg => Plugin.Config;
 
     [HarmonyPostfix]
-    [HarmonyPriority(Priority.High)]
     [HarmonyPatch("Start")]
     static void Init(MenuManager __instance) {
         Instance = __instance;
@@ -44,7 +43,7 @@ internal class MenuManagerPatch {
         *  This is slightly hacky but ensures all references are not null
         *  and that the mod makes its changes after all others.
         */  
-        yield return new WaitForSeconds(0);
+        yield return new WaitUntil(() => !GameNetworkManager.Instance.firstTimeInMenu);
 
         MenuContainer = GameObject.Find("MenuContainer")?.transform;
         MenuPanel = MenuContainer?.Find("MainButtons");

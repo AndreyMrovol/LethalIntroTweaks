@@ -79,7 +79,7 @@ public class Plugin : BaseUnityPlugin {
         };
     }
 
-    private void SceneLoaded(Scene scene, LoadSceneMode _) {
+    void SceneLoaded(Scene scene, LoadSceneMode _) {
         switch(scene.name) {
             case "InitScene":
             case "InitSceneLaunchOptions":

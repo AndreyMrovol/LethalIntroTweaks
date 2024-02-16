@@ -1,6 +1,22 @@
 # Changelog History
 This list is reads from bottom to top, with latest versions first.
 
+## v1.4.6
+- Implemented new config option `bAutoStartGame` which will automatically pull the lever. You can find this in the **Miscellaneous** section.
+- Addressed occasional (but harmless) errors being logged by editing the menu elements too early.
+- Defaulted `bAutoSelectMode` to `OFF` so it's opt-in rather than opt-out.
+- Improved compatibility with **LethalLevelLoader** by loading the scene asynchronously if found.
+    > This is the shittiest "solution" and should be addressed further by LLL.
+
+## v1.4.5
+- Fixed issue where `bAutoSelectHost` would cause a black screen to be shown, softlocking the menu.
+- Fixed issue where the **MoreCompany** cosmetics button could not be clicked when `bFixMenuCanvas` was false.
+- Implemented new `bFixMoreCompany` config option to ease any further bugs with **MoreCompany**.
+    - Defaults to **true**. Disable this if you do not care about the look of your main menu.
+
+## v1.4.4
+- Minor changes to Thunderstore metadata.
+
 ## v1.4.3
 ### Deleting your config file is recommended!
 - Fixed wrong version showing by replacing `sVersionTextFormat` with `bAlwaysShortVersion`.
